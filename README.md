@@ -1,2 +1,2 @@
 # gcp-backend
-Google Cloud Print backend for common printing dialog project
+Implementation of Google Cloud Print Backend for the Common Printing Dialog (as a part of GSoC 2017)
