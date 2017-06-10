@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<node name="/" xmlns:doc="http://www.freedesktop.org/dbus/1.0/doc.dtd">
+  <interface name="org.openprinting.GCPBackend">
+    <method name="GetPrinters">
+      <arg name="options" type="as" direction="out">
+      </arg>
+    </method>
+    <method name="GetPrinterOptions">
+      <arg name="uid" type="s" direction="in">
+      </arg>
+      <arg name="options" type="v" direction="out">
+      </arg>
+    </method>
+    <method name="PrintFile">
+      <arg name="uid" type="s" direction="in">
+      </arg>
+      <arg name="fd" type="h" direction="in">
+      </arg>
+    </method>
+  </interface>
+</node>
