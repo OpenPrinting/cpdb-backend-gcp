@@ -30,3 +30,6 @@
 *.exe
 *.out
 *.app
+
+# App details
+app_details.json

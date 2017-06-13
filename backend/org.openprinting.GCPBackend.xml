@@ -2,13 +2,13 @@
 <node name="/" xmlns:doc="http://www.freedesktop.org/dbus/1.0/doc.dtd">
   <interface name="org.openprinting.GCPBackend">
     <method name="GetPrinters">
-      <arg name="options" type="as" direction="out">
+      <arg name="printers" type="s" direction="out">
       </arg>
     </method>
     <method name="GetPrinterOptions">
       <arg name="uid" type="s" direction="in">
       </arg>
-      <arg name="options" type="v" direction="out">
+      <arg name="options" type="s" direction="out">
       </arg>
     </method>
     <method name="PrintFile">
