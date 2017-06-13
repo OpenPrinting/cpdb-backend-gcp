@@ -39,8 +39,8 @@ void	gcp_object_instance_init	(GTypeInstance *instance, gpointer g_class);
 
 /* All these functions are methods of GCPObject. */
 gchar* gcp_object_get_printers (GCPObject *self);
-gchar* gcp_object_get_printer_options (GCPObject *self, guint);
-gchar* gcp_object_submit_print_job (GCPObject *self, guint, gchar*, gchar*);
+gchar* gcp_object_get_printer_options (GCPObject *self, gchar*);
+void gcp_object_submit_print_job (GCPObject *self, gchar*, gchar*, gchar*);
 
 /* Handy macros */
 #define GCP_OBJECT_TYPE		(gcp_object_get_type ())
