@@ -7,12 +7,12 @@ struct _GCPObject
 {
   GTypeInstance gtype;
 
-  gchar *AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth";
-  gchar *API_URL = "https://www.googleapis.com/oauth2/v4/token";
-  gchar *CLIENT_ID = "473470378528-lh7nlpmn2d8bhas1r51iibhjc70vsi74.apps.googleusercontent.com";
-  gchar *CLIENT_SECRET = "0COpUUBTN-S5fgyBd0PfQzg1";
-  gchar *SCOPE = "https://www.googleapis.com/auth/cloudprint";
-  gchar *REDIRECT_URI = "urn:ietf:wg:oauth:2.0:oob";
+  gchar *AUTH_URL;
+  gchar *API_URL;
+  gchar *CLIENT_ID;
+  gchar *CLIENT_SECRET;
+  gchar *SCOPE;
+  gchar *REDIRECT_URI;
 
   gchar *access_token;
   gchar *refresh_token;
