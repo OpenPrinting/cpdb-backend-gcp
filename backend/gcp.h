@@ -1,53 +1,36 @@
-#ifndef _GCP_H_
-#define _GCP_H_
+#ifndef GCP_H
+#define GCP_H
 
-/* "Instance struct" that defines all the data fields for out object. */
-typedef struct _GCPObject GCPObject;
-struct _GCPObject
-{
-  GTypeInstance gtype;
+#include <glib-object.h>
 
-  gchar *AUTH_URL;
-  gchar *API_URL;
-  gchar *CLIENT_ID;
-  gchar *CLIENT_SECRET;
-  gchar *SCOPE;
-  gchar *REDIRECT_URI;
+G_BEGIN_DECLS
 
-  gchar *access_token;
-  gchar *refresh_token;
-  gchar *token_type;
-  gchar *expires_in;
-  gchar *error;
-  gchar *error_description;
-};
+#define GOOGLECLOUDPRINT_TYPE_GCP (gcp_object_get_type())
 
-/* "Class struct" that defines all the method functions that our object will share. */
-typedef struct _GCPObjectClass GCPObjectClass;
-struct _GCPObjectClass
-{
-  GTypeClass gtypeclass;
-};
+G_DECLARE_FINAL_TYPE (GCPObject, gcp_object, GOOGLECLOUDPRINT, GCP, GObject)
 
-/* This method returns the GType associated with our new object type. */
-GType	gcp_object_get_type (void);
+const gchar *gcp_object_get_auth_url (GCPObject *self);
+const gchar *gcp_object_get_api_url (GCPObject *self);
+const gchar *gcp_object_get_scope (GCPObject *self);
+const gchar *gcp_object_get_redirect_uri (GCPObject *self);
 
-/* These are the Class/Instance Initialize/Finalize functions. Their signature is determined in gtype.h. */
-void	gcp_object_class_init		(gpointer g_class, gpointer class_data);
-void	gcp_object_class_final		(gpointer g_class, gpointer class_data);
-void	gcp_object_instance_init	(GTypeInstance *instance, gpointer g_class);
+void gcp_object_set_auth_url (GCPObject *self, const gchar *auth_url);
+void gcp_object_set_api_url (GCPObject *self, const gchar *api_url);
+void gcp_object_set_scope (GCPObject *self, const gchar *scope);
+void gcp_object_set_redirect_uri (GCPObject *self, const gchar *redirect_uri);
 
-/* All these functions are methods of GCPObject. */
-gchar* gcp_object_get_printers (GCPObject *self);
-gchar* gcp_object_get_printer_options (GCPObject *self, gchar*);
-void gcp_object_submit_print_job (GCPObject *self, gchar*, gchar*, gchar*);
+gchar *gcp_object_get_printers (GCPObject *self, const gchar *access_token);
 
-/* Handy macros */
-#define GCP_OBJECT_TYPE		(gcp_object_get_type ())
-#define GCP_OBJECT(obj)		(G_TYPE_CHECK_INSTANCE_CAST ((obj), GCP_OBJECT_TYPE, GCPObject))
-#define GCP_OBJECT_CLASS(c)		(G_TYPE_CHECK_CLASS_CAST ((c), GCP_OBJECT_TYPE, GCPObjectClass))
-#define GCP_IS_OBJECT(obj)		(G_TYPE_CHECK_TYPE ((obj), GCP_OBJECT_TYPE))
-#define GCP_IS_OBJECT_CLASS(c)		(G_TYPE_CHECK_CLASS_TYPE ((c), GCP_OBJECT_TYPE))
-#define GCP_OBJECT_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS ((obj), GCP_OBJECT_TYPE, GCPObjectClass))
+gchar *gcp_object_get_printer_options (GCPObject   *self,
+                                       const gchar *uid,
+                                       const gchar *access_token);
 
-#endif /* GCP_H_ */
+gboolean gcp_object_submit_print_job (GCPObject   *self,
+                                      const gchar *uid,
+                                      const gchar *access_token,
+                                      const gchar *title,
+                                      const gchar *ticket);
+
+G_END_DECLS
+
+#endif /* GCP_H */

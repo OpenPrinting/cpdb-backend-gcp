@@ -1,12 +1,190 @@
-#include <glib-object.h>
 #include "gcp.h"
 
+struct _GCPObject
+{
+  GObject parent_instance;
 
-/* Public methods */
-gchar* gcp_object_get_printers(GCPObject *self)
+  gchar *auth_url;
+  gchar *api_url;
+  gchar *scope;
+  gchar *redirect_uri;
+};
+
+G_DEFINE_TYPE (GCPObject, gcp_object, G_TYPE_OBJECT)
+
+enum {
+  PROP_0,
+  PROP_AUTH_URL,
+  PROP_API_URL,
+  PROP_SCOPE,
+  PROP_REDIRECT_URI,
+  LAST_PROP
+};
+
+static GParamSpec *properties [LAST_PROP];
+
+static void
+gcp_object_get_property (GObject    *object,
+                         guint      prop_id,
+                         GValue     *value,
+                         GParamSpec *pspec)
+{
+  GCPObject *self = (GCPObject *)object;
+
+  switch (prop_id)
+    {
+    case PROP_AUTH_URL:
+        g_value_set_string (value, gcp_object_get_auth_url(self));
+        break;
+    case PROP_API_URL:
+        g_value_set_string (value, gcp_object_get_api_url(self));
+        break;
+    case PROP_SCOPE:
+        g_value_set_string (value, gcp_object_get_scope(self));
+        break;
+    case PROP_REDIRECT_URI:
+        g_value_set_string (value, gcp_object_get_redirect_uri(self));
+        break;
+    }
+}
+
+static void
+gcp_object_set_property (GObject          *object,
+                         guint            prop_id,
+                         const GValue     *value,
+                         GParamSpec       *pspec)
+{
+  GCPObject *self = (GCPObject *)object;
+
+  switch (prop_id)
+    {
+    case PROP_AUTH_URL:
+        gcp_object_set_auth_url(self, g_value_get_string (value));
+        break;
+    case PROP_API_URL:
+        gcp_object_set_api_url(self, g_value_get_string (value));
+        break;
+    case PROP_SCOPE:
+        gcp_object_set_scope(self, g_value_get_string (value));
+        break;
+    case PROP_REDIRECT_URI:
+        gcp_object_set_redirect_uri(self, g_value_get_string (value));
+        break;
+    }
+}
+
+static void
+gcp_object_class_init (GCPObjectClass *klass)
+{
+  GObjectClass *object_class = G_OBJECT_CLASS (klass);
+
+  object_class->get_property = gcp_object_get_property;
+  object_class->set_property = gcp_object_set_property;
+
+  properties [PROP_AUTH_URL] =
+    g_param_spec_string ("auth_url",
+                         "Auth_URL",
+                         "Authentication URL",
+                         NULL,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties [PROP_API_URL] =
+    g_param_spec_string ("api_url",
+                         "API_URL",
+                         "Google APIs URL",
+                         NULL,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties [PROP_SCOPE] =
+    g_param_spec_string ("scope",
+                         "Scope",
+                         "Cloudprint API scope",
+                         NULL,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_STATIC_STRINGS));
+
+  properties [PROP_REDIRECT_URI] =
+    g_param_spec_string ("redirect_uri",
+                         "Redirect_URI",
+                         "Redirection URI",
+                         NULL,
+                         (G_PARAM_READWRITE |
+                          G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_properties (object_class, LAST_PROP, properties);
+}
+
+static void
+gcp_object_init (GCPObject *self)
+{
+}
+
+const gchar *
+gcp_object_get_auth_url (GCPObject *self)
+{
+  return self->auth_url;
+}
+
+const gchar *
+gcp_object_get_api_url (GCPObject *self)
+{
+  return self->api_url;
+}
+
+const gchar *
+gcp_object_get_scope (GCPObject *self)
+{
+  return self->scope;
+}
+
+const gchar *
+gcp_object_get_redirect_uri (GCPObject *self)
+{
+  return self->redirect_uri;
+}
+
+void gcp_object_set_auth_url (GCPObject *self, const gchar *auth_url)
+{
+  if (g_strcmp0( auth_url, self->auth_url) == 0)
+		{
+			g_free(self->auth_url);
+			self->auth_url = g_strdup(auth_url);
+		}
+}
+
+void gcp_object_set_api_url (GCPObject *self, const gchar *api_url)
+{
+  if (g_strcmp0( api_url, self->api_url) == 0)
+  		{
+  			g_free(self->api_url);
+  			self->api_url = g_strdup(api_url);
+  		}
+}
+
+void gcp_object_set_scope (GCPObject *self, const gchar *scope)
+{
+  if (g_strcmp0( scope, self->scope) == 0)
+  		{
+  			g_free(self->scope);
+  			self->scope = g_strdup(scope);
+  		}
+}
+
+void gcp_object_set_redirect_uri (GCPObject *self, const gchar *redirect_uri)
+{
+  if (g_strcmp0( redirect_uri, self->redirect_uri) == 0)
+  		{
+  			g_free(self->redirect_uri);
+  			self->redirect_uri = g_strdup(redirect_uri);
+  		}
+}
+
+gchar* gcp_object_get_printers (GCPObject *self, const gchar *access_token)
 {
   gchar *url = "https://www.google.com/cloudprint/search?access_token=";
-  url = g_strconcat(url, self->access_token, NULL);
+  url = g_strconcat (url, access_token, NULL);
   gchar *printers = "list of printers";
 
   /* TODO: Make api request to get a list of printers. */
@@ -14,10 +192,12 @@ gchar* gcp_object_get_printers(GCPObject *self)
   return printers;
 }
 
-gchar* gcp_object_get_printer_options(GCPObject *self, gchar *uid)
+gchar* gcp_object_get_printer_options (GCPObject   *self,
+                                       const gchar *uid,
+                                       const gchar *access_token)
 {
   gchar *url = "https://www.google.com/cloudprint/printer?access_token=";
-  url = g_strconcat(url, self->access_token, "&printerid=", uid, NULL);
+  url = g_strconcat (url, access_token, "&printerid=", uid, NULL);
   gchar *printer_options = "printer options";
 
   /* TODO: Make api request to get a list of options for a particular printer. */
@@ -25,91 +205,12 @@ gchar* gcp_object_get_printer_options(GCPObject *self, gchar *uid)
   return printer_options;
 }
 
-void gcp_object_submit_print_job(GCPObject *self,
-                                   gchar *uid,
-                                   gchar *title,
-                                   gchar *ticket)
+gboolean gcp_object_submit_print_job (GCPObject   *self,
+                                      const gchar *uid,
+                                      const gchar *access_token,
+                                      const gchar *title,
+                                      const gchar *ticket)
 {
   /* TODO: Make api request to submit a file for printing. */
-}
-
-/* This is called when the class object is created. */
-void	gcp_object_class_init		(gpointer g_class, gpointer class_data)
-{
-	//GCPObjectClass	*this_class	= GCP_OBJECT_CLASS (g_class);
-}
-
-/* This is called when the class object is no longer used. */
-void	gcp_object_class_final		(gpointer g_class, gpointer class_data)
-{
-	/* No class finalization needed. */
-}
-
-/* This is called when a instance object is created. The instance's class is passed as g_class. */
-void	gcp_object_instance_init	(GTypeInstance *instance, gpointer g_class)
-{
-	GCPObject *this_object = GCP_OBJECT (instance);
-
-  /* fill in the instance struct members */
-  this_object->AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth";
-  this_object->API_URL = "https://www.googleapis.com/oauth2/v4/token";
-  this_object->CLIENT_ID = "473470378528-lh7nlpmn2d8bhas1r51iibhjc70vsi74.apps.googleusercontent.com";
-  this_object->CLIENT_SECRET = "0COpUUBTN-S5fgyBd0PfQzg1";
-  this_object->SCOPE = "https://www.googleapis.com/auth/cloudprint";
-  this_object->REDIRECT_URI = "urn:ietf:wg:oauth:2.0:oob";
-
-	this_object->access_token = NULL;
-	this_object->refresh_token = NULL;
-	this_object->token_type = NULL;
-  this_object->expires_in = NULL;
-  this_object->error = NULL;
-  this_object->error_description = NULL;
-}
-
-/* Since there is no base class to derive from, base_init/finalize are NULL */
-GType	gcp_object_get_type (void)
-{
-	static GType type = 0;
-
-	if (type == 0)
-	{
-		/* This is the structure that the system uses to fully describe
-		how a type should be created, initialized and finalized. */
-
-		static const GTypeInfo type_info =
-		{
-			sizeof (GCPObjectClass),
-			NULL,				/* base_init */
-			NULL,				/* base_finalize */
-			gcp_object_class_init,		/* class_init */
-			gcp_object_class_final,	/* class_finalize */
-			NULL,				/* class_data */
-			sizeof (GCPObject),
-			0,				/* n_preallocs */
-			gcp_object_instance_init	/* instance_init */
-    };
-
-		/* Since our type has no parent, it is considered
-		"fundamental", and we have to inform the system that our
-		type is both classed (unlike say a float, int, or pointer),
-		and is instantiable (the system can create instance objects).
-		for example, Interfaces or Abstract classes are not
-		instantiable. */
-
-		static const GTypeFundamentalInfo fundamental_info =
-		{
-			G_TYPE_FLAG_CLASSED | G_TYPE_FLAG_INSTANTIATABLE
-		};
-
-		type = g_type_register_fundamental
-		(
-			g_type_fundamental_next (),	/* next available GType number */
-			"GCPObjectType",		/* type name as string */
-			&type_info,			/* type info as above */
-			&fundamental_info,		/* fundamental info as above */
-			0				/* type is not abstract */
-		);
-	}
-
-	return	type;
+  return TRUE;
 }
