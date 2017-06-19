@@ -6,14 +6,13 @@
 
 G_BEGIN_DECLS
 
-typedef struct _GCPObject GCPObject;
-typedef struct _GCPObjectClass GCPObjectClass;
-
 #define GCP_TYPE_OBJECT gcp_object_get_type()
 G_DECLARE_DERIVABLE_TYPE (GCPObject, gcp_object, GCP, OBJECT, GObject)
 
 struct _GCPObjectClass
 {
+  GObjectClass parent;
+
   gchar * (*get_printers) (GCPObject *, const gchar *);
 
   gchar * (*get_printer_options) (GCPObject *,
