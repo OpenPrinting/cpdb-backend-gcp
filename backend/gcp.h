@@ -13,9 +13,9 @@ struct _GCPObjectClass
 {
   GObjectClass parent;
 
-  gchar * (*get_printers) (GCPObject *, const gchar *);
+  const gchar * (*get_printers) (GCPObject *, const gchar *);
 
-  gchar * (*get_printer_options) (GCPObject *,
+  const gchar * (*get_printer_options) (GCPObject *,
                                   const gchar *,
                                   const gchar *);
 
@@ -29,10 +29,10 @@ struct _GCPObjectClass
 GCPObject *
 gcp_object_new ();
 
-gchar *
+const gchar *
 gcp_object_get_printers (GCPObject *self, const gchar *access_token);
 
-gchar *
+const gchar *
 gcp_object_get_printer_options (GCPObject   *self,
                                 const gchar *uid,
                                 const gchar *access_token);

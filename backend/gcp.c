@@ -4,11 +4,11 @@
 G_DEFINE_TYPE (GCPObject, gcp_object, G_TYPE_OBJECT)
 
 /*****************************************************************************/
-gchar *
+const gchar *
 gcp_object_real_get_printers (GCPObject *self,
                               const gchar *access_token);
 
-gchar *
+const gchar *
 gcp_object_real_get_printer_options (GCPObject   *self,
                                      const gchar *uid,
                                      const gchar *access_token);
@@ -42,18 +42,18 @@ gcp_object_class_init (GCPObjectClass *klass)
   klass->submit_print_job = gcp_object_real_submit_print_job;
 }
 
-gchar *
+const gchar *
 gcp_object_get_printers (GCPObject *self, const gchar *access_token)
 {
   g_return_val_if_fail (GCP_IS_OBJECT (self), g_strdup ("Type Error"));
 
   GCPObjectClass *klass = GCP_OBJECT_GET_CLASS (self);
-  gchar *printers = klass->get_printers (self, access_token);
+  const gchar *printers = klass->get_printers (self, access_token);
 
   return printers;
 }
 
-gchar *
+const gchar *
 gcp_object_get_printer_options (GCPObject   *self,
                                 const gchar *uid,
                                 const gchar *access_token)
@@ -61,7 +61,7 @@ gcp_object_get_printer_options (GCPObject   *self,
   g_return_val_if_fail (GCP_IS_OBJECT (self), g_strdup ("Type Error"));
 
   GCPObjectClass *klass = GCP_OBJECT_GET_CLASS (self);
-  gchar *printer_options = klass->get_printer_options (self, uid, access_token);
+  const gchar *printer_options = klass->get_printer_options (self, uid, access_token);
 
   return printer_options;
 }
@@ -84,31 +84,72 @@ gcp_object_submit_print_job (GCPObject   *self,
 
 /*****************************************************************************/
 
-gchar *
+const gchar *
 gcp_object_real_get_printers (GCPObject *self,
                               const gchar *access_token)
 {
-  gchar *url = "https://www.google.com/cloudprint/search?access_token=";
-  url = g_strconcat (url, access_token, NULL);
-  gchar *header = "X-CloudPrint-Proxy: Common Printing Dialog";
+  RestProxy *proxy;
+  RestProxyCall *call;
 
-  gchar *printers = make_curl_request (url, header);
+  const gchar *header = "X-CloudPrint-Proxy";
+  const gchar *header_value = "Common Printing Dialog";
+  const gchar *method = "GET";
+  const gchar *function = "search";
+  const gchar *param1_name = "access_token";
+
+  gboolean res = FALSE;
+
+  proxy = rest_proxy_new ("https://www.google.com/cloudprint/", FALSE);
+  call = rest_proxy_new_call (proxy);
+  res = make_api_request (proxy, &call, method, function, header, header_value, param1_name, access_token);
+
+  const gchar *printers;
+
+  if (res)
+  {
+    printers = rest_proxy_call_get_payload (call);
+  }
+  else
+  {
+    printers = g_strdup("API request failed!");
+  }
 
   /* TODO: Error handling in case something goes wrong. */
 
   return printers;
 }
 
-gchar *
+const gchar *
 gcp_object_real_get_printer_options (GCPObject   *self,
                                      const gchar *uid,
                                      const gchar *access_token)
 {
-  gchar *url = "https://www.google.com/cloudprint/printer?access_token=";
-  url = g_strconcat (url, access_token, "&printerid=", uid, NULL);
-  gchar *header = "X-CloudPrint-Proxy: Common Printing Dialog";
+  RestProxy *proxy;
+  RestProxyCall *call;
 
-  gchar *printer_options = make_curl_request (url, header);
+  const gchar *header = "X-CloudPrint-Proxy";
+  const gchar *header_value = "Common Printing Dialog";
+  const gchar *method = "GET";
+  const gchar *function = "printer";
+  const gchar *param1_name = "access_token";
+  const gchar *param2_name = "printerid";
+
+  gboolean res = FALSE;
+
+  proxy = rest_proxy_new ("https://www.google.com/cloudprint/", FALSE);
+  call = rest_proxy_new_call (proxy);
+  res = make_api_request (proxy, &call, method, function, header, header_value, param1_name, access_token, param2_name, uid);
+
+  const gchar *printer_options;
+
+  if (res)
+  {
+    printer_options = rest_proxy_call_get_payload (call);
+  }
+  else
+  {
+    printer_options = g_strdup("API request failed!");
+  }
 
   /* TODO: Error handling in case something goes wrong. */
 
