@@ -45,7 +45,7 @@ gcp_object_class_init (GCPObjectClass *klass)
 GList *
 gcp_object_get_printers (GCPObject *self, const gchar *access_token)
 {
-  g_return_val_if_fail (GCP_IS_OBJECT (self), g_strdup ("Type Error"));
+  g_return_val_if_fail (GCP_IS_OBJECT (self), NULL);
 
   GCPObjectClass *klass = GCP_OBJECT_GET_CLASS (self);
   const gchar *printers = klass->get_printers (self, access_token);
