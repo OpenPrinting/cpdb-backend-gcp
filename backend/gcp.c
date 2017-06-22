@@ -42,7 +42,7 @@ gcp_object_class_init (GCPObjectClass *klass)
   klass->submit_print_job = gcp_object_real_submit_print_job;
 }
 
-const gchar *
+GList *
 gcp_object_get_printers (GCPObject *self, const gchar *access_token)
 {
   g_return_val_if_fail (GCP_IS_OBJECT (self), g_strdup ("Type Error"));
@@ -50,7 +50,11 @@ gcp_object_get_printers (GCPObject *self, const gchar *access_token)
   GCPObjectClass *klass = GCP_OBJECT_GET_CLASS (self);
   const gchar *printers = klass->get_printers (self, access_token);
 
-  return printers;
+  JsonObject *jobject = json_data_get_root (printers);
+  JsonArray *jarray = get_array_from_json_object (jobject, "printers");
+  GList *printer_names = get_glist_for_string_member_in_json_array (jarray, "displayName");
+
+  return printer_names;
 }
 
 const gchar *

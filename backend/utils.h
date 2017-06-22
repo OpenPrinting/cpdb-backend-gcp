@@ -3,6 +3,7 @@
 
 #include <rest/rest-proxy.h>
 #include <rest/rest-proxy-call.h>
+#include <json-glib/json-glib.h>
 
 gboolean make_api_request (RestProxy   *proxy,
                          RestProxyCall **call,
@@ -12,5 +13,14 @@ gboolean make_api_request (RestProxy   *proxy,
                          const gchar   *header_value,
                          ...
                          );
+
+JsonObject *json_data_get_root (const gchar *data);
+
+JsonArray *get_array_from_json_object (JsonObject *jobject,
+                                       const gchar *name);
+
+GList *get_glist_for_string_member_in_json_array (JsonArray *jarray,
+                                                  const gchar *name);
+
 
 #endif /* UTILS_H */
