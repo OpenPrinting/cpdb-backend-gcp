@@ -6,7 +6,8 @@ G_DEFINE_TYPE (GCPObject, gcp_object, G_TYPE_OBJECT)
 /*****************************************************************************/
 const gchar *
 gcp_object_real_get_printers (GCPObject *self,
-                              const gchar *access_token);
+                              const gchar *access_token,
+                              const gchar *connection_status);
 
 const gchar *
 gcp_object_real_get_printer_options (GCPObject   *self,
@@ -43,12 +44,12 @@ gcp_object_class_init (GCPObjectClass *klass)
 }
 
 GHashTable *
-gcp_object_get_printers (GCPObject *self, const gchar *access_token)
+gcp_object_get_printers (GCPObject *self, const gchar *access_token, const gchar *connection_status)
 {
   g_return_val_if_fail (GCP_IS_OBJECT (self), NULL);
 
   GCPObjectClass *klass = GCP_OBJECT_GET_CLASS (self);
-  const gchar *printers = klass->get_printers (self, access_token);
+  const gchar *printers = klass->get_printers (self, access_token, connection_status);
 
   JsonObject *jobject = json_data_get_root (printers);
   JsonArray *jarray = get_array_from_json_object (jobject, "printers");
@@ -90,7 +91,8 @@ gcp_object_submit_print_job (GCPObject   *self,
 
 const gchar *
 gcp_object_real_get_printers (GCPObject *self,
-                              const gchar *access_token)
+                              const gchar *access_token,
+                              const gchar *connection_status)
 {
   RestProxy *proxy;
   RestProxyCall *call;
@@ -100,14 +102,15 @@ gcp_object_real_get_printers (GCPObject *self,
   const gchar *method = "GET";
   const gchar *function = "search";
   const gchar *param1_name = "access_token";
-  const gchar *param2_name = "connection_status";
-  const gchar *param2_value = "ALL";
 
   gboolean res = FALSE;
 
   proxy = rest_proxy_new ("https://www.google.com/cloudprint/", FALSE);
   call = rest_proxy_new_call (proxy);
-  res = make_api_request (proxy, &call, method, function, header, header_value, param1_name, access_token, param2_name, param2_value, NULL);
+  if (connection_status != NULL)
+    res = make_api_request (proxy, &call, method, function, header, header_value, param1_name, access_token, "connection_status", connection_status, NULL);
+  else
+    res = make_api_request (proxy, &call, method, function, header, header_value, param1_name, access_token, NULL);
 
   const gchar *printers;
 

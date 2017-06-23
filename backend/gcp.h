@@ -13,7 +13,9 @@ struct _GCPObjectClass
 {
   GObjectClass parent;
 
-  const gchar * (*get_printers) (GCPObject *, const gchar *);
+  const gchar * (*get_printers) (GCPObject *,
+                                 const gchar *,
+                                 const gchar *);
 
   const gchar * (*get_printer_options) (GCPObject *,
                                   const gchar *,
@@ -30,7 +32,9 @@ GCPObject *
 gcp_object_new ();
 
 GHashTable *
-gcp_object_get_printers (GCPObject *self, const gchar *access_token);
+gcp_object_get_printers (GCPObject *self,
+                         const gchar *access_token,
+                         const gchar *connection_status);
 
 const gchar *
 gcp_object_get_printer_options (GCPObject   *self,

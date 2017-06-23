@@ -10,7 +10,8 @@ main (int argc, char **argv)
 
   GHashTableIter iter;
   gpointer key, value;
-  GHashTable *printers = gcp_object_get_printers (gcp, access_token);
+  // give "ALL" as third param to get a list of all printers intead of only active printers
+  GHashTable *printers = gcp_object_get_printers (gcp, access_token, NULL);
 
 
   // while(printers != NULL)
