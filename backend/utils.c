@@ -72,3 +72,23 @@ GList *get_glist_for_string_member_in_json_array (JsonArray *jarray,
   }
   return glist;
 }
+
+GHashTable *get_ghashtable_for_id_and_value_in_json_array (JsonArray *jarray,
+                                                           const gchar *id,
+                                                           const gchar *name)
+{
+  GHashTable *ghashtable = g_hash_table_new (NULL, NULL);
+  GList *jnodes = json_array_get_elements (jarray);
+  while (jnodes != NULL)
+  {
+    JsonObject *jobject = json_node_get_object (jnodes->data);
+    g_assert (jobject != NULL);
+    g_assert (json_object_has_member (jobject, id) == TRUE);
+    g_assert (json_object_has_member (jobject, name) == TRUE);
+    const gchar *id_ = json_object_get_string_member (jobject, id);
+    const gchar *name_ = json_object_get_string_member (jobject, name);
+    g_hash_table_insert (ghashtable, (gpointer *)id_, (gpointer *)name_);
+    jnodes = jnodes->next;
+  }
+  return ghashtable;
+}

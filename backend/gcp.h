@@ -29,7 +29,7 @@ struct _GCPObjectClass
 GCPObject *
 gcp_object_new ();
 
-GList *
+GHashTable *
 gcp_object_get_printers (GCPObject *self, const gchar *access_token);
 
 const gchar *

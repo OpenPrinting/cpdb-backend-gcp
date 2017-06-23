@@ -6,12 +6,24 @@ main (int argc, char **argv)
   GCPObject *gcp = gcp_object_new ();
 
   const gchar *access_token = "";
-  GList *printers = gcp_object_get_printers (gcp, access_token);
+  // GList *printers = gcp_object_get_printers (gcp, access_token);
 
-  while(printers != NULL)
+  GHashTableIter iter;
+  gpointer key, value;
+  GHashTable *printers = gcp_object_get_printers (gcp, access_token);
+
+
+  // while(printers != NULL)
+  // {
+    // g_print ("%s\n", (gchar *)printers->data);
+    // printers = printers->next;
+  // }
+
+
+  g_hash_table_iter_init (&iter, printers);
+  while (g_hash_table_iter_next (&iter, &key, &value))
   {
-    g_print ("%s\n", (gchar *)printers->data);
-    printers = printers->next;
+      g_print ("%s => %s\n", (gchar *)key, (gchar *)value);
   }
 
   // const gchar *uid = "__google__docs";

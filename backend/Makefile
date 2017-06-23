@@ -13,10 +13,10 @@ OBJ=test.o\
 		utils.o
 
 $(EXEC): $(OBJ)
-	$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)
+	$(CC) -g -o $@ $^ $(CFLAGS) $(LDFLAGS)
 
 %.o: %.c
-	$(CC) -c -o $@ $< $(CFLAGS)
+	$(CC) -g -c -o $@ $< $(CFLAGS)
 
 .PHONY: clean run
 

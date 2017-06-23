@@ -42,7 +42,7 @@ gcp_object_class_init (GCPObjectClass *klass)
   klass->submit_print_job = gcp_object_real_submit_print_job;
 }
 
-GList *
+GHashTable *
 gcp_object_get_printers (GCPObject *self, const gchar *access_token)
 {
   g_return_val_if_fail (GCP_IS_OBJECT (self), NULL);
@@ -52,9 +52,9 @@ gcp_object_get_printers (GCPObject *self, const gchar *access_token)
 
   JsonObject *jobject = json_data_get_root (printers);
   JsonArray *jarray = get_array_from_json_object (jobject, "printers");
-  GList *printer_names = get_glist_for_string_member_in_json_array (jarray, "displayName");
+  GHashTable *printer_id_name_pairs = get_ghashtable_for_id_and_value_in_json_array (jarray, "id", "displayName");
 
-  return printer_names;
+  return printer_id_name_pairs;
 }
 
 const gchar *
@@ -100,12 +100,14 @@ gcp_object_real_get_printers (GCPObject *self,
   const gchar *method = "GET";
   const gchar *function = "search";
   const gchar *param1_name = "access_token";
+  const gchar *param2_name = "connection_status";
+  const gchar *param2_value = "ALL";
 
   gboolean res = FALSE;
 
   proxy = rest_proxy_new ("https://www.google.com/cloudprint/", FALSE);
   call = rest_proxy_new_call (proxy);
-  res = make_api_request (proxy, &call, method, function, header, header_value, param1_name, access_token);
+  res = make_api_request (proxy, &call, method, function, header, header_value, param1_name, access_token, param2_name, param2_value, NULL);
 
   const gchar *printers;
 

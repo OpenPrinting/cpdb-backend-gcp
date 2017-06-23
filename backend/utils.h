@@ -23,4 +23,8 @@ GList *get_glist_for_string_member_in_json_array (JsonArray *jarray,
                                                   const gchar *name);
 
 
+GHashTable *get_ghashtable_for_id_and_value_in_json_array (JsonArray *jarray,
+                                                           const gchar *id,
+                                                           const gchar *name);
+
 #endif /* UTILS_H */
