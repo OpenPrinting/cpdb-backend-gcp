@@ -27,4 +27,6 @@ GHashTable *get_ghashtable_for_id_and_value_in_json_array (JsonArray *jarray,
                                                            const gchar *id,
                                                            const gchar *name);
 
+GHashTable *get_vendor_capability_hashtable (JsonArray *jarray);
+
 #endif /* UTILS_H */

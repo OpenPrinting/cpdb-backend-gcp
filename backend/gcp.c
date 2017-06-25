@@ -58,17 +58,27 @@ gcp_object_get_printers (GCPObject *self, const gchar *access_token, const gchar
   return printer_id_name_pairs;
 }
 
-const gchar *
+GHashTable *
 gcp_object_get_printer_options (GCPObject   *self,
                                 const gchar *uid,
                                 const gchar *access_token)
 {
-  g_return_val_if_fail (GCP_IS_OBJECT (self), g_strdup ("Type Error"));
+  g_return_val_if_fail (GCP_IS_OBJECT (self), NULL);
 
   GCPObjectClass *klass = GCP_OBJECT_GET_CLASS (self);
-  const gchar *printer_options = klass->get_printer_options (self, uid, access_token);
+  const gchar *printer_options_json = klass->get_printer_options (self, uid, access_token);
+  JsonObject *root = json_data_get_root (printer_options_json);
+  JsonArray *jarray = get_array_from_json_object (root, "printers");
+  JsonNode *jnode = json_array_get_element (jarray, 0);
+  JsonObject *jobject = json_node_get_object (jnode);
+  JsonNode *capabilities_node = json_object_get_member (jobject, "capabilities");
+  JsonObject *capabilities_obj = json_node_get_object (capabilities_node);
+  JsonNode *printer_node = json_object_get_member (capabilities_obj, "printer");
+  JsonObject *printer_options = json_node_get_object (printer_node);
+  JsonArray *vendor_capability = get_array_from_json_object (printer_options, "vendor_capability");
+  GHashTable *printer_options_hashtable = get_vendor_capability_hashtable (vendor_capability);
 
-  return printer_options;
+  return printer_options_hashtable;
 }
 
 gboolean
@@ -147,7 +157,7 @@ gcp_object_real_get_printer_options (GCPObject   *self,
 
   proxy = rest_proxy_new ("https://www.google.com/cloudprint/", FALSE);
   call = rest_proxy_new_call (proxy);
-  res = make_api_request (proxy, &call, method, function, header, header_value, param1_name, access_token, param2_name, uid);
+  res = make_api_request (proxy, &call, method, function, header, header_value, param1_name, access_token, param2_name, uid, NULL);
 
   const gchar *printer_options;
 

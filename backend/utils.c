@@ -92,3 +92,36 @@ GHashTable *get_ghashtable_for_id_and_value_in_json_array (JsonArray *jarray,
   }
   return ghashtable;
 }
+
+GHashTable *get_vendor_capability_hashtable (JsonArray *jarray)
+{
+  GHashTable *ghashtable = g_hash_table_new (NULL, NULL);
+  GList *vendor_capability_nodes = json_array_get_elements (jarray);
+  while (vendor_capability_nodes != NULL)
+  {
+    JsonObject *jobject = json_node_get_object (vendor_capability_nodes->data);
+    g_assert (jobject != NULL);
+    g_assert (json_object_has_member (jobject, "id") == TRUE);
+    g_assert (json_object_has_member (jobject, "select_cap") == TRUE);
+    const gchar *id = json_object_get_string_member (jobject, "id");
+    JsonNode *select_cap_node = json_object_get_member (jobject, "select_cap");
+    JsonObject *select_cap_obj = json_node_get_object (select_cap_node);
+    JsonArray *options = get_array_from_json_object (select_cap_obj, "option");
+
+    GList *option_list = json_array_get_elements (options);
+    GList *values = NULL;
+    while (option_list != NULL)
+    {
+      JsonObject *option_obj = json_node_get_object (option_list->data);
+      g_assert (option_obj != NULL);
+      g_assert (json_object_has_member (option_obj, "value") == TRUE);
+      const gchar *value = json_object_get_string_member (option_obj, "value");
+      values = g_list_append (values, (gpointer *)value);
+      option_list = option_list->next;
+    }
+
+    g_hash_table_insert (ghashtable, (gpointer *)id, (gpointer *)values);
+    vendor_capability_nodes = vendor_capability_nodes->next;
+  }
+  return ghashtable;
+}

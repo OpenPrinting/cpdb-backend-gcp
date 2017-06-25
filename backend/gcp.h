@@ -36,7 +36,7 @@ gcp_object_get_printers (GCPObject *self,
                          const gchar *access_token,
                          const gchar *connection_status);
 
-const gchar *
+GHashTable *
 gcp_object_get_printer_options (GCPObject   *self,
                                 const gchar *uid,
                                 const gchar *access_token);
