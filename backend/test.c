@@ -1,17 +1,28 @@
 #include "gcp.h"
 #include <stdio.h>
+// #include <string.h>
 
 int
 main (int argc, char **argv)
 {
   GCPObject *gcp = gcp_object_new ();
-
-  const gchar *access_token = "";
+  GError *error = NULL;
+  gchar *access_token = g_malloc (150);
+  gint expires_in;
+  gboolean res = get_access_token (&access_token, &expires_in, &error);
+  g_assert (res == TRUE);
+  // g_print ("%ld\n", strlen (access_token));
+  // if (get_access_token (&access_token, &expires_in, &error))
+  //   g_print ("%s\n", access_token);
+  // else
+  //   g_print ("get_access_token() failed!\n");
   // GList *printers = gcp_object_get_printers (gcp, access_token);
 
   GHashTableIter iter;
   gpointer key, value;
+
   // give "ALL" as third param to get a list of all printers intead of only active printers
+  // give NULL as third param to get a list of only active printers
   GHashTable *printers = gcp_object_get_printers (gcp, access_token, "ALL");
 
 

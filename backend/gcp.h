@@ -3,6 +3,7 @@
 
 #include <glib.h>
 #include <glib-object.h>
+#include "utils.h"
 
 G_BEGIN_DECLS
 

@@ -1,5 +1,4 @@
 #include "gcp.h"
-#include "utils.h"
 
 G_DEFINE_TYPE (GCPObject, gcp_object, G_TYPE_OBJECT)
 

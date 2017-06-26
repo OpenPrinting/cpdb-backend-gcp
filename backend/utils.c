@@ -125,3 +125,37 @@ GHashTable *get_vendor_capability_hashtable (JsonArray *jarray)
   }
   return ghashtable;
 }
+
+gboolean get_access_token (gchar **out_access_token,
+                           gint *out_expires_in,
+                           GError **error)
+{
+  GoaClient *client = goa_client_new_sync (NULL, error);
+  GList *accounts, *l;
+  GoaOAuth2Based *oauth2;
+
+  accounts = goa_client_get_accounts (client);
+  for (l = accounts; l != NULL; l = l->next) {
+    GoaObject *object = GOA_OBJECT (l->data);
+    GoaAccount *account = goa_object_peek_account (object);
+
+    if ((g_strcmp0 (goa_account_get_provider_type (account), "google") == 0) &&
+         !goa_account_get_printers_disabled (account)) {
+       oauth2 = goa_object_get_oauth2_based (object);
+       break;
+    }
+  }
+
+  if (!oauth2) {
+    return FALSE;
+  }
+
+  *error = NULL;
+  gboolean res = goa_oauth2_based_call_get_access_token_sync
+                                    (oauth2,
+                                     out_access_token,
+                                     out_expires_in,
+                                     NULL,
+                                     error);
+  return res;
+}
