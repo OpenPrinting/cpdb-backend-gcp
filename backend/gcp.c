@@ -75,9 +75,9 @@ gcp_object_get_printer_options (GCPObject   *self,
   JsonNode *printer_node = json_object_get_member (capabilities_obj, "printer");
   JsonObject *printer_options = json_node_get_object (printer_node);
   JsonArray *vendor_capability = get_array_from_json_object (printer_options, "vendor_capability");
-  GHashTable *printer_options_hashtable = get_vendor_capability_hashtable (vendor_capability);
-
-  return printer_options_hashtable;
+  GHashTable *vendor_capability_hashtable = get_vendor_capability_hashtable (vendor_capability);
+  
+  return vendor_capability_hashtable;
 }
 
 gboolean

@@ -116,11 +116,11 @@ GHashTable *get_vendor_capability_hashtable (JsonArray *jarray)
       g_assert (option_obj != NULL);
       g_assert (json_object_has_member (option_obj, "value") == TRUE);
       const gchar *value = json_object_get_string_member (option_obj, "value");
-      values = g_list_append (values, (gpointer *)value);
+      values = g_list_append (values, (gpointer)value);
       option_list = option_list->next;
     }
 
-    g_hash_table_insert (ghashtable, (gpointer *)id, (gpointer *)values);
+    g_hash_table_insert (ghashtable, (gpointer)id, (gpointer)values);
     vendor_capability_nodes = vendor_capability_nodes->next;
   }
   return ghashtable;
