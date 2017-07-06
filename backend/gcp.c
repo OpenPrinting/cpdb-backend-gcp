@@ -74,9 +74,19 @@ gcp_object_get_printer_options (GCPObject   *self,
   JsonObject *capabilities_obj = json_node_get_object (capabilities_node);
   JsonNode *printer_node = json_object_get_member (capabilities_obj, "printer");
   JsonObject *printer_options = json_node_get_object (printer_node);
-  JsonArray *vendor_capability = get_array_from_json_object (printer_options, "vendor_capability");
-  GHashTable *vendor_capability_hashtable = get_vendor_capability_hashtable (vendor_capability);
-  
+  JsonArray *vendor_capability_array = get_array_from_json_object (printer_options, "vendor_capability");
+  GHashTable *vendor_capability_hashtable = g_hash_table_new (NULL, NULL);
+
+  JsonNode *media_size_node = json_object_get_member (printer_options, "media_size");
+  JsonObject *media_size_object = json_node_get_object (media_size_node);
+  JsonArray *media_options_array = get_array_from_json_object (media_size_object, "option");
+
+  GList *media_size_options_list = get_media_size_options (media_options_array);
+  GList *vendor_capability_list = get_vendor_capability_options (vendor_capability_array);
+
+  g_hash_table_insert (vendor_capability_hashtable, (gpointer)"vendor_capability_list", (gpointer)vendor_capability_list);
+  g_hash_table_insert (vendor_capability_hashtable, (gpointer)"media_size_options_list", (gpointer)media_size_options_list);
+
   return vendor_capability_hashtable;
 }
 

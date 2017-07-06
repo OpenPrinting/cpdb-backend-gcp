@@ -93,39 +93,6 @@ GHashTable *get_ghashtable_for_id_and_value_in_json_array (JsonArray *jarray,
   return ghashtable;
 }
 
-GHashTable *get_vendor_capability_hashtable (JsonArray *jarray)
-{
-  GHashTable *ghashtable = g_hash_table_new (NULL, NULL);
-  GList *vendor_capability_nodes = json_array_get_elements (jarray);
-  while (vendor_capability_nodes != NULL)
-  {
-    JsonObject *jobject = json_node_get_object (vendor_capability_nodes->data);
-    g_assert (jobject != NULL);
-    g_assert (json_object_has_member (jobject, "id") == TRUE);
-    g_assert (json_object_has_member (jobject, "select_cap") == TRUE);
-    const gchar *id = json_object_get_string_member (jobject, "id");
-    JsonNode *select_cap_node = json_object_get_member (jobject, "select_cap");
-    JsonObject *select_cap_obj = json_node_get_object (select_cap_node);
-    JsonArray *options = get_array_from_json_object (select_cap_obj, "option");
-
-    GList *option_list = json_array_get_elements (options);
-    GList *values = NULL;
-    while (option_list != NULL)
-    {
-      JsonObject *option_obj = json_node_get_object (option_list->data);
-      g_assert (option_obj != NULL);
-      g_assert (json_object_has_member (option_obj, "value") == TRUE);
-      const gchar *value = json_object_get_string_member (option_obj, "value");
-      values = g_list_append (values, (gpointer)value);
-      option_list = option_list->next;
-    }
-
-    g_hash_table_insert (ghashtable, (gpointer)id, (gpointer)values);
-    vendor_capability_nodes = vendor_capability_nodes->next;
-  }
-  return ghashtable;
-}
-
 gboolean get_access_token (gchar **out_access_token,
                            gint *out_expires_in,
                            GError **error)
@@ -158,4 +125,98 @@ gboolean get_access_token (gchar **out_access_token,
                                      NULL,
                                      error);
   return res;
+}
+
+GList *get_media_size_options (JsonArray *jarray)
+{
+  GList *media_size_options = NULL;
+  GList *media_size_nodes = json_array_get_elements (jarray);
+  while (media_size_nodes != NULL)
+  {
+    JsonObject *jobject = json_node_get_object (media_size_nodes->data);
+    g_assert (jobject != NULL);
+    g_assert (json_object_has_member (jobject, "height_microns") == TRUE);
+    g_assert (json_object_has_member (jobject, "width_microns") == TRUE);
+    g_assert (json_object_has_member (jobject, "is_continuous_feed") == TRUE);
+    g_assert (json_object_has_member (jobject, "is_default") == TRUE);
+    g_assert (json_object_has_member (jobject, "vendor_id") == TRUE);
+    g_assert (json_object_has_member (jobject, "name") == TRUE);
+    g_assert (json_object_has_member (jobject, "custom_display_name") == TRUE);
+
+    gint64 height_microns = json_object_get_int_member (jobject, "height_microns");
+    gint64 width_microns = json_object_get_int_member (jobject, "width_microns");
+    gboolean is_continuous_feed = json_object_get_boolean_member (jobject, "is_continuous_feed");
+    gboolean is_default = json_object_get_boolean_member (jobject, "is_default");
+    const gchar *vendor_id = json_object_get_string_member (jobject, "vendor_id");
+    const gchar *name = json_object_get_string_member (jobject, "name");
+    const gchar *custom_display_name = json_object_get_string_member (jobject, "custom_display_name");
+
+    media_size *media = g_malloc (sizeof (media_size));
+    media->height_microns = height_microns;
+    media->width_microns = width_microns;
+    media->is_continuous_feed = is_continuous_feed;
+    media->is_default = is_default;
+    media->vendor_id = g_strdup (vendor_id);
+    media->name = g_strdup (name);
+    media->custom_display_name = g_strdup (custom_display_name);
+
+    media_size_options = g_list_append (media_size_options, (gpointer) media);
+
+    media_size_nodes = media_size_nodes->next;
+  }
+  return media_size_options;
+}
+
+GList *get_vendor_capability_options (JsonArray *jarray)
+{
+  GList *vendor_capability_list = NULL;
+  GList *vendor_capability_nodes = json_array_get_elements (jarray);
+  while (vendor_capability_nodes != NULL)
+  {
+    JsonObject *jobject = json_node_get_object (vendor_capability_nodes->data);
+    g_assert (jobject != NULL);
+    g_assert (json_object_has_member (jobject, "id") == TRUE);
+    g_assert (json_object_has_member (jobject, "display_name") == TRUE);
+    g_assert (json_object_has_member (jobject, "type") == TRUE);
+    g_assert (json_object_has_member (jobject, "select_cap") == TRUE);
+
+    const gchar *id = json_object_get_string_member (jobject, "id");
+    const gchar *display_name = json_object_get_string_member (jobject, "display_name");
+    const gchar *type = json_object_get_string_member (jobject, "type");
+    JsonNode *select_cap_node = json_object_get_member (jobject, "select_cap");
+    JsonObject *select_cap_obj = json_node_get_object (select_cap_node);
+    JsonArray *options = get_array_from_json_object (select_cap_obj, "option");
+
+    vendor_capability *capabilities = g_malloc (sizeof (vendor_capability));
+    capabilities->id = g_strdup (id);
+    capabilities->display_name = g_strdup (display_name);
+    capabilities->type = g_strdup (type);
+    capabilities->options = NULL;
+
+    GList *option_list = json_array_get_elements (options);
+    GList *values = NULL;
+    while (option_list != NULL)
+    {
+      JsonObject *option_obj = json_node_get_object (option_list->data);
+      g_assert (option_obj != NULL);
+      g_assert (json_object_has_member (option_obj, "display_name") == TRUE);
+      g_assert (json_object_has_member (option_obj, "is_default") == TRUE);
+      g_assert (json_object_has_member (option_obj, "value") == TRUE);
+      const gchar *option_display_name = json_object_get_string_member (option_obj, "display_name");
+      gboolean option_is_default = json_object_get_boolean_member (option_obj, "is_default");
+      const gchar *value = json_object_get_string_member (option_obj, "value");
+
+      vendor_capability_option *vc_option = g_malloc (sizeof (vendor_capability_option));
+      vc_option->display_name = g_strdup (option_display_name);
+      vc_option->is_default = option_is_default;
+      vc_option->value = g_strdup (value);
+
+      capabilities->options = g_list_append (capabilities->options, (gpointer)vc_option);
+      option_list = option_list->next;
+    }
+
+    vendor_capability_list = g_list_append (vendor_capability_list, (gpointer)capabilities);
+    vendor_capability_nodes = vendor_capability_nodes->next;
+  }
+  return vendor_capability_list;
 }

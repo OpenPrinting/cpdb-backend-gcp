@@ -46,19 +46,55 @@ main (int argc, char **argv)
   // const gchar *uid = "__google__docs";
   GHashTable *printer_options = gcp_object_get_printer_options (gcp, uid, access_token);
   g_assert (printer_options != NULL);
-  g_hash_table_iter_init (&iter, printer_options);
-  while (g_hash_table_iter_next (&iter, &key, &value))
+  GList *keys = g_hash_table_get_keys (printer_options);
+  while (keys != NULL)
   {
-      GList *values = (GList *)value;
-      g_print ("%s\n", (gchar *)key);
-      while (values != NULL)
+    if(g_strcmp0 ((gchar *)keys->data, "vendor_capability_list") == 0)
+    {
+      g_print ("vendor_capability_list\n");
+      GList *vendor_capability_list = (GList *)g_hash_table_lookup (printer_options, keys->data);
+      g_assert (vendor_capability_list != NULL);
+      while (vendor_capability_list != NULL)
       {
-        g_print ("\t%s\n", (gchar *)values->data);
-        values = values->next;
-      }
-      g_print ("\n\n");
-  }
+        vendor_capability *capabilities = vendor_capability_list->data;
+        g_print ("%s\n", capabilities->id);
+        g_print ("%s\n", capabilities->display_name);
+        g_print ("%s\n", capabilities->type);
 
+        GList *vc_options = capabilities->options;
+        while(vc_options != NULL)
+        {
+          vendor_capability_option *vc_option = vc_options->data;
+          g_print ("%s\n", vc_option->display_name);
+          g_print ("%d\n", vc_option->is_default);
+          g_print ("%s\n", vc_option->value);
+          vc_options = vc_options->next;
+        }
+
+        vendor_capability_list = vendor_capability_list->next;
+      }
+    }
+    else if (g_strcmp0 ((gchar *)keys->data, "media_size_options_list") == 0)
+    {
+      g_print ("media_size_options_list\n");
+      GList *media_size_options_list = (GList *)g_hash_table_lookup (printer_options, keys->data);
+      g_assert (media_size_options_list != NULL);
+      while (media_size_options_list != NULL)
+      {
+        media_size *option = media_size_options_list->data;
+        g_print ("%s\n", option->name);
+        g_print ("%s\n", option->vendor_id);
+        g_print ("%s\n", option->custom_display_name);
+        g_print ("%d\n", option->height_microns);
+        g_print ("%d\n", option->width_microns);
+        g_print ("%d\n", option->is_default);
+        g_print ("%d\n", option->is_continuous_feed);
+
+        media_size_options_list = media_size_options_list->next;
+      }
+    }
+    keys = keys->next;
+  }
 
   // g_print ("%s\n", printer_options);
 
