@@ -42,7 +42,7 @@ gcp_object_class_init (GCPObjectClass *klass)
   klass->submit_print_job = gcp_object_real_submit_print_job;
 }
 
-GHashTable *
+GVariant *
 gcp_object_get_printers (GCPObject *self, const gchar *access_token, const gchar *connection_status)
 {
   g_return_val_if_fail (GCP_IS_OBJECT (self), NULL);
@@ -54,10 +54,11 @@ gcp_object_get_printers (GCPObject *self, const gchar *access_token, const gchar
   JsonArray *jarray = get_array_from_json_object (jobject, "printers");
   GHashTable *printer_id_name_pairs = get_ghashtable_for_id_and_value_in_json_array (jarray, "id", "displayName");
 
-  return printer_id_name_pairs;
+  GVariant *g_variant = (GVariant *)printer_id_name_pairs;
+  return g_variant;
 }
 
-GHashTable *
+GVariant *
 gcp_object_get_printer_options (GCPObject   *self,
                                 const gchar *uid,
                                 const gchar *access_token)
@@ -87,7 +88,8 @@ gcp_object_get_printer_options (GCPObject   *self,
   g_hash_table_insert (vendor_capability_hashtable, (gpointer)"vendor_capability_list", (gpointer)vendor_capability_list);
   g_hash_table_insert (vendor_capability_hashtable, (gpointer)"media_size_options_list", (gpointer)media_size_options_list);
 
-  return vendor_capability_hashtable;
+  GVariant *g_variant = (GVariant *)vendor_capability_hashtable;
+  return g_variant;
 }
 
 gboolean
