@@ -22,3 +22,8 @@ $(EXEC): $(OBJ)
 
 clean:
 	rm -f $(OBJ) $(EXEC)
+
+gen: genback
+
+genback:
+	gdbus-codegen --generate-c-code backend_interface  --interface-prefix org.openprinting org.openprinting.Backend.xml
