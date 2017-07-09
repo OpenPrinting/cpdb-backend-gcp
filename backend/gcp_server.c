@@ -1,108 +1,160 @@
-#include<gio/gio.h>
-#include<gio/gunixfdlist.h>
-#include<stdlib.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <glib.h>
+#include "gcp.h"
 
-static GDBusNodeInfo *introspection_data = NULL;
+#define BUS_NAME "org.openprinting.Backend.GCP"
+#define OBJECT_PATH "/"
 
 static void
-handle_method_call (GDBusConnection       *connection,
-                    const gchar           *sender,
-                    const gchar           *object_path,
-                    const gchar           *interface_name,
-                    const gchar           *method_name,
-                    GVariant              *parameters,
-                    GDBusMethodInvocation *invocation,
-                    gpointer              user_data)
-{
-  if( g_strcmp0 (method_name, "GetPrinters") == 0 )
-    {
-      /*
-      *  TODO: call the utility method from gcp.h to fetch the list
-      *        of printers associated with user's google account.
-      */
-    }
-  if( g_strcmp0 (method_name, "GetPrinterOptions") == 0 )
-    {
-      /*
-      *  TODO: call the utility method from gcp.h to fetch the details about
-      *        a particular printer.
-      */
-    }
-  if( g_strcmp0 (method_name, "PrintFile") == 0 )
-    {
-      /* TODO: call the utility method from gcp.h along with printing
-      *        specific parameters to print a file on a particular google
-      *        cloud printer associated with user's google account.
-      */
-    }
-}
-
-static const GDBusInterfaceVTable interface_vtable =
-  {
-    handle_method_call,
-    NULL,
-    NULL
-  };
+acquire_session_bus_name ();
 
 static void
 on_name_acquired (GDBusConnection *connection,
-                  const gchar     *name,
-                  gpointer        user_data)
+                  const gchar *name,
+                  gpointer user_data);
+
+static gboolean
+on_handle_get_printers (PrintBackend *skeleton,
+                        GDBusMethodInvocation *invocation,
+                        const gchar *access_token,
+                        const gchar *connection_status,
+                        gpointer user_data);
+
+static gboolean
+on_handle_get_printer_options (PrintBackend *skeleton,
+                               GDBusMethodInvocation *invocation,
+                               const gchar *uid,
+                               const gchar *access_token,
+                               gpointer user_data);
+
+static gboolean
+on_handle_submit_print_job (PrintBackend *skeleton,
+                            GDBusMethodInvocation *invocation,
+                            const gchar *uid,
+                            const gchar *access_token,
+                            const gchar *title,
+                            const gchar *ticket,
+                            gpointer user_data);
+
+void connect_to_signals (PrintBackend *skeleton);
+
+int
+main (int argc, char **arg)
 {
-  guint registration_id = g_dbus_connection_register_object(connection,
-                                                            "/org/openprinting/GCPBackend",
-                                                            introspection_data->interfaces[0],
-                                                            &interface_vtable,
-                                                            NULL,
-                                                            NULL,
-                                                            NULL);
-  g_assert( registration_id > 0 );
+  acquire_session_bus_name ();
+  GMainLoop *loop = g_main_loop_new (NULL, FALSE);
+  g_main_loop_run (loop);
+  return 0;
 }
 
 static void
-on_name_lost ( GDBusConnection *connection,
-               const gchar     *name,
-               gpointer        user_data)
+acquire_session_bus_name ()
 {
-  exit(1);
+  g_bus_own_name (G_BUS_TYPE_SESSION,
+                  BUS_NAME,
+                  0,                    // Flags
+                  NULL,                 // bus acquired handler
+                  on_name_acquired,     // name acquired handler
+                  NULL,                 // name lost handler
+                  NULL,                 // user_data
+                  NULL);                // user_data_free_func
 }
 
-int
-main( int argc, char **argv )
+static void
+on_name_acquired (GDBusConnection *connection,
+                  const gchar *name,
+                  gpointer user_data)
 {
-  GDBusConnection *connection;
-  GError *error = NULL;
-  GMainLoop *loop;
-  gchar *contents;
-  guint owner_id;
-  guint subscription_id;
+  PrintBackend *skeleton;
+  skeleton = print_backend_skeleton_new ();
+  connect_to_signals (skeleton);
+  connect_to_dbus (connection, skeleton, OBJECT_PATH);
+}
 
-  connection = g_bus_get_sync(G_BUS_TYPE_SESSION, NULL, &error);
-  g_assert_no_error(error);
-  g_assert(connection != NULL);
+void
+connect_to_signals (PrintBackend *skeleton)
+{
+  g_signal_connect (skeleton,
+                    "handle_get_printers",
+                    G_CALLBACK (on_handle_get_printers),
+                    NULL);
 
-  error = NULL;
+  g_signal_connect (skeleton,
+                    "handle_get_printer_options",
+                    G_CALLBACK (on_handle_get_printer_options),
+                    NULL);
 
-  g_file_get_contents("./org.openprinting.GCPBackend.xml", &contents, NULL, &error);
-  g_assert_no_error(error);
-  g_assert(contents != NULL);
+  g_signal_connect (skeleton,
+                    "handle_submit_print_job",
+                    G_CALLBACK (on_handle_submit_print_job),
+                    NULL);
+}
 
-  introspection_data = g_dbus_node_info_new_for_xml(contents, NULL);
-  g_assert(introspection_data != NULL);
-  g_free(contents);
+static gboolean
+on_handle_get_printers (PrintBackend *skeleton,
+                        GDBusMethodInvocation *invocation,
+                        const gchar *access_token,
+                        const gchar *connection_status,
+                        gpointer user_data)
 
-  owner_id = g_bus_own_name_on_connection (connection,
-                                           "org.openprinting.GCPBackend",
-                                           G_BUS_NAME_OWNER_FLAGS_NONE,
-                                           on_name_acquired,
-                                           on_name_lost,
-                                           NULL,
-                                           NULL);
+{
+  GCPObject *gcp = gcp_object_new ();
+  GVariant *printers = gcp_object_get_printers (gcp,
+                                                access_token,
+                                                "ALL");
 
-  loop = g_main_loop_new(NULL, FALSE);
-  g_main_loop_run(loop);
-  g_bus_unown_name(owner_id);
-  g_dbus_node_info_unref(introspection_data);
-  g_object_unref(connection);
-  return 0;
+  g_assert (printers != NULL);
+
+/******************************************************************************/
+  GHashTableIter iter;
+  gpointer key, value;
+  GHashTable *printers_hashtable = (GHashTable *)printers;
+  g_hash_table_iter_init (&iter, printers_hashtable);
+  while (g_hash_table_iter_next (&iter, &key, &value))
+  {
+      g_print ("%s => %s\n\n", (gchar *)key, (gchar *)value);
+  }
+/******************************************************************************/
+
+  print_backend_complete_get_printers (skeleton,
+                                       invocation,
+                                       printers);
+
+  g_object_unref (gcp);
+  return TRUE;
+}
+
+static gboolean
+on_handle_get_printer_options (PrintBackend *skeleton,
+                               GDBusMethodInvocation *invocation,
+                               const gchar *uid,
+                               const gchar *access_token,
+                               gpointer user_data)
+{
+  GCPObject *gcp = gcp_object_new ();
+  GVariant *printer_options = gcp_object_get_printer_options(gcp,
+                                                             uid,
+                                                             access_token);
+
+  g_assert (printer_options != NULL);
+  print_backend_complete_get_printer_options (skeleton,
+                                              invocation,
+                                              printer_options);
+
+  g_object_unref (gcp);
+  return TRUE;
+}
+
+static gboolean
+on_handle_submit_print_job (PrintBackend *skeleton,
+                            GDBusMethodInvocation *invocation,
+                            const gchar *uid,
+                            const gchar *access_token,
+                            const gchar *title,
+                            const gchar *ticket,
+                            gpointer user_data)
+{
+  /* TODO: Implement on_handle_submit_print_job() */ 
+  return FALSE;
 }

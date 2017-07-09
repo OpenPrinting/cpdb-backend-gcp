@@ -220,3 +220,15 @@ GList *get_vendor_capability_options (JsonArray *jarray)
   }
   return vendor_capability_list;
 }
+
+void connect_to_dbus (GDBusConnection *connection,
+                      PrintBackend *skeleton,
+                      gchar *obj_path)
+{
+  GError *error = NULL;
+  g_dbus_interface_skeleton_export(G_DBUS_INTERFACE_SKELETON(skeleton),
+                                   connection,
+                                   obj_path,
+                                   &error);
+  g_assert_no_error(error);
+}

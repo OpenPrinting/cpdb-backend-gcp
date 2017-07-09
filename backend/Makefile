@@ -1,16 +1,20 @@
 CC=gcc
-CFLAGS=-std=c11 `pkg-config --cflags glib-2.0 gio-2.0 gobject-2.0 rest-0.7 json-glib-1.0 goa-1.0`
-LDFLAGS=`pkg-config --libs glib-2.0 gio-2.0 gobject-2.0 rest-0.7 json-glib-1.0 goa-1.0`
+CFLAGS=-std=c11 `pkg-config --cflags gio-unix-2.0 glib-2.0 gio-2.0 gobject-2.0 rest-0.7 json-glib-1.0 goa-1.0`
+LDFLAGS=`pkg-config --libs glib-2.0 gio-unix-2.0 gio-2.0 gobject-2.0 rest-0.7 json-glib-1.0 goa-1.0`
 
 EXEC=main
 
 SRC=test.c\
     gcp.c\
-		utils.c
+		utils.c\
+		backend_interface.c\
+		gcp_server.c
 
 OBJ=test.o\
     gcp.o\
-		utils.o
+		utils.o\
+		backend_interface.o\
+		gcp_server.o
 
 $(EXEC): $(OBJ)
 	$(CC) -g -o $@ $^ $(CFLAGS) $(LDFLAGS)

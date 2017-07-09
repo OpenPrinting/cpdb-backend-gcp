@@ -7,6 +7,7 @@
 #include <rest/rest-proxy-call.h>
 #include <json-glib/json-glib.h>
 #include <goa/goa.h>
+#include "backend_interface.h"
 
 typedef struct media_size{
   gint height_microns;
@@ -60,5 +61,9 @@ gboolean get_access_token (gchar **out_access_token,
 GList *get_media_size_options (JsonArray *jarray);
 
 GList *get_vendor_capability_options (JsonArray *array);
+
+void connect_to_dbus (GDBusConnection *connection,
+                      PrintBackend *skeleton,
+                      gchar *obj_path);
 
 #endif /* UTILS_H */
