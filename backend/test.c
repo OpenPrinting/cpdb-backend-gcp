@@ -1,4 +1,4 @@
-#include "gcp.h"
+#include "gcp_server.h"
 #include <stdio.h>
 
 static void
@@ -10,15 +10,17 @@ int
 main ()
 {
   // GCPObject *gcp = gcp_object_new ();
+  ServerObject *gcp_server = server_object_new ();
   GError *error = NULL;
   gchar *access_token = g_malloc (150);
   gchar *connection_status = "ALL";
   gint expires_in;
   gboolean res = get_access_token (&access_token, &expires_in, &error);
   g_assert (res == TRUE);
+  g_print ("%s\n", access_token);
 
-  GHashTableIter iter;
-  gpointer key, value;
+  // GHashTableIter iter;
+  // gpointer key, value;
 
   PrintBackend *proxy;
   GVariant *retval;
@@ -118,5 +120,5 @@ callback_get_printers_async(GObject *proxy,
       g_assert (retval != NULL);
     }
     else
-      g_print("ERROR!!\n");
+      g_print("%s\n", error->message);
 }
