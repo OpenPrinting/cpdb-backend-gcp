@@ -1,5 +1,5 @@
-#ifndef GCP_NEW_H
-#define GCP_NEW_H
+#ifndef __GCP_H__
+#define __GCP_H__
 
 #include <glib.h>
 #include <glib-object.h>
