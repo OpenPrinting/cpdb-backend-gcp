@@ -26,7 +26,7 @@ main ()
   GVariant *retval;
 
   error = NULL;
-  proxy = print_backend_proxy_new_for_bus_sync(G_BUS_TYPE_SESSION, 0, "org.openprinting", "/", NULL, &error);
+  proxy = print_backend_proxy_new_for_bus_sync(G_BUS_TYPE_SESSION, 0, "org.openprinting.Backend.GCP", "/", NULL, &error);
 
   error = NULL;
   print_backend_call_get_printers(proxy, access_token, connection_status, NULL, callback_get_printers_async, &error);

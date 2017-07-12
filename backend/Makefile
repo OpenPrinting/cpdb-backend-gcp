@@ -4,17 +4,19 @@ LDFLAGS=`pkg-config --libs glib-2.0 gio-unix-2.0 gio-2.0 gobject-2.0 rest-0.7 js
 
 EXEC=main
 
-SRC=test.c\
-    gcp.c\
+SRC=gcp.c\
 		utils.c\
 		backend_interface.c\
-		gcp_server.c
+		gcp_server.c\
+		server.c\
+		client.c
 
-OBJ=test.o\
-    gcp.o\
+OBJ=gcp.o\
 		utils.o\
 		backend_interface.o\
-		gcp_server.o
+		gcp_server.o\
+		server.o\
+		client.o
 
 $(EXEC): $(OBJ)
 	$(CC) -g -o $@ $^ $(CFLAGS) $(LDFLAGS)
