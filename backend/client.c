@@ -18,17 +18,14 @@ main ()
   g_print ("%s\n", access_token);
 
   PrintBackend *proxy;
-  GVariant *retval;
+  // GVariant *retval;
 
   error = NULL;
   proxy = print_backend_proxy_new_for_bus_sync(G_BUS_TYPE_SESSION, 0, "org.openprinting.Backend.GCP", "/", NULL, &error);
 
   error = NULL;
-  print_backend_call_get_printers(proxy, access_token, connection_status, NULL, callback_get_printers_async, &error);
-
-  GMainLoop *loop;
-  loop = g_main_loop_new(NULL, FALSE);
-  g_main_loop_run(loop);
+  print_backend_call_get_printers (proxy, access_token, connection_status, NULL, callback_get_printers_async, &error);
+  // print_backend_call_get_printers_sync (proxy, access_token, connection_status, &retval, NULL, &error);
 
   g_object_unref(proxy);
   return 0;

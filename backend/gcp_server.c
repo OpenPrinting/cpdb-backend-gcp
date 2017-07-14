@@ -23,8 +23,6 @@ server_object_class_init (ServerObjectClass *klass)
 {
   GObjectClass *parent_class = G_OBJECT_CLASS (klass);
   acquire_session_bus_name ();
-  //GMainLoop *loop = g_main_loop_new (NULL, FALSE);
-  //g_main_loop_run (loop);
 }
 
 static void
@@ -98,7 +96,7 @@ on_handle_get_printers (PrintBackend *skeleton,
       g_print ("%s => %s\n\n", (gchar *)key, (gchar *)value);
   }
 /******************************************************************************/
-  g_print ("here\n");
+
   print_backend_complete_get_printers (skeleton,
                                        invocation,
                                        printers);

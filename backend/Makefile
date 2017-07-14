@@ -9,13 +9,13 @@ genback:
 	gdbus-codegen --generate-c-code backend_interface  --interface-prefix org.openprinting org.openprinting.Backend.xml
 
 %.o: %.c
-	gcc -o $@ $^ -c $(FLAGS)
+	gcc -g -o $@ $^ -c $(FLAGS)
 
 server: server.o gcp_server.o backend_interface.o utils.o gcp.o
-	gcc -o $@ $^ $(FLAGS)
+	gcc -g -o $@ $^ $(FLAGS)
 
 client: client.o backend_interface.o utils.o
-	gcc -o $@ $^ $(FLAGS)
+	gcc -g -o $@ $^ $(FLAGS)
 
 clean_gen:
 	rm -f backend_interface.*
