@@ -1,35 +1,24 @@
-CC=gcc
-CFLAGS=-std=c11 `pkg-config --cflags gio-unix-2.0 glib-2.0 gio-2.0 gobject-2.0 rest-0.7 json-glib-1.0 goa-1.0`
-LDFLAGS=`pkg-config --libs glib-2.0 gio-unix-2.0 gio-2.0 gobject-2.0 rest-0.7 json-glib-1.0 goa-1.0`
+FLAGS=$(shell pkg-config --libs --cflags gio-unix-2.0 glib-2.0 gio-2.0 gobject-2.0 rest-0.7 json-glib-1.0 goa-1.0)
+.PHONY:all gen lib
 
-EXEC=main
+all: client server
 
-SRC=gcp.c\
-		utils.c\
-		backend_interface.c\
-		gcp_server.c\
-		server.c\
-		client.c
-
-OBJ=gcp.o\
-		utils.o\
-		backend_interface.o\
-		gcp_server.o\
-		server.o\
-		client.o
-
-$(EXEC): $(OBJ)
-	$(CC) -g -o $@ $^ $(CFLAGS) $(LDFLAGS)
-
-%.o: %.c
-	$(CC) -g -c -o $@ $< $(CFLAGS)
-
-.PHONY: clean run
-
-clean:
-	rm -f $(OBJ) $(EXEC)
-
-gen: genback
+gen:genback
 
 genback:
 	gdbus-codegen --generate-c-code backend_interface  --interface-prefix org.openprinting org.openprinting.Backend.xml
+
+%.o: %.c
+	gcc -o $@ $^ -c $(FLAGS)
+
+server: server.o gcp_server.o backend_interface.o utils.o gcp.o
+	gcc -o $@ $^ $(FLAGS)
+
+client: client.o backend_interface.o utils.o
+	gcc -o $@ $^ $(FLAGS)
+
+clean_gen:
+	rm -f backend_interface.*
+
+clean:
+	rm -f *.o client server
