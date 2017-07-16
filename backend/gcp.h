@@ -27,17 +27,24 @@ struct _GCPObjectClass
                                 const gchar *,
                                 const gchar *,
                                 const gchar *);
+
+  const gchar * (*get_print_jobs) (GCPObject *,
+                                   const gchar *,
+                                   const gchar *,
+                                   const gchar *,
+                                   const gchar *,
+                                   const gchar *);
 };
 
 GCPObject *
 gcp_object_new ();
 
-GVariant *
+GHashTable *
 gcp_object_get_printers (GCPObject *self,
                          const gchar *access_token,
                          const gchar *connection_status);
 
-GVariant *
+GHashTable *
 gcp_object_get_printer_options (GCPObject   *self,
                                 const gchar *uid,
                                 const gchar *access_token);
@@ -48,6 +55,14 @@ gcp_object_submit_print_job (GCPObject   *self,
                              const gchar *access_token,
                              const gchar *title,
                              const gchar *ticket);
+
+GList *
+gcp_object_get_print_jobs (GCPObject *self,
+                           const gchar *access_token,
+                           const gchar *uid,
+                           const gchar *owner,
+                           const gchar *status,
+                           const gchar *sortorder);
 
 G_END_DECLS
 

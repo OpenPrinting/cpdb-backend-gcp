@@ -32,6 +32,14 @@ typedef struct vendor_capability{
   GList *options;
 } vendor_capability;
 
+typedef struct print_job{
+  gchar *id;
+  gchar *title;
+  gchar *printerid;
+  gchar *printerName;
+  gchar *status;
+} print_job;
+
 gboolean make_api_request (RestProxy     *proxy,
                            RestProxyCall **call,
                            const gchar   *method,
@@ -61,6 +69,8 @@ gboolean get_access_token (gchar **out_access_token,
 GList *get_media_size_options (JsonArray *jarray);
 
 GList *get_vendor_capability_options (JsonArray *array);
+
+GList *get_print_jobs_list (JsonArray *jarray);
 
 void connect_to_dbus (GDBusConnection *connection,
                       PrintBackend *skeleton,

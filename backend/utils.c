@@ -221,6 +221,41 @@ GList *get_vendor_capability_options (JsonArray *jarray)
   return vendor_capability_list;
 }
 
+GList *get_print_jobs_list (JsonArray *jarray)
+{
+  GList *print_jobs = json_array_get_elements (jarray);
+  GList *print_jobs_list = NULL;
+  while (print_jobs != NULL)
+  {
+    JsonObject *job_obj = json_node_get_object (print_jobs->data);
+    g_assert (job_obj != NULL);
+    g_assert (json_object_has_member (job_obj, "id") == TRUE);
+    g_assert (json_object_has_member (job_obj, "title") == TRUE);
+    g_assert (json_object_has_member (job_obj, "printerid") == TRUE);
+    g_assert (json_object_has_member (job_obj, "printerName") == TRUE);
+    g_assert (json_object_has_member (job_obj, "status") == TRUE);
+
+    const gchar *id = json_object_get_string_member (job_obj, "id");
+    const gchar *title = json_object_get_string_member (job_obj, "title");
+    const gchar *printerid = json_object_get_string_member (job_obj, "printerid");
+    const gchar *printerName = json_object_get_string_member (job_obj, "printerName");
+    const gchar *status = json_object_get_string_member (job_obj, "status");
+
+    print_job *print_job_struct = g_malloc (sizeof (print_job));
+
+    print_job_struct->id = g_strdup (id);
+    print_job_struct->title = g_strdup (title);
+    print_job_struct->printerid = g_strdup (printerid);
+    print_job_struct->printerName = g_strdup (printerName);
+    print_job_struct->status = g_strdup (status);
+
+    print_jobs_list = g_list_append (print_jobs_list, (gpointer)print_job_struct);
+
+    print_jobs = print_jobs->next;
+  }
+  return print_jobs_list;
+}
+
 void connect_to_dbus (GDBusConnection *connection,
                       PrintBackend *skeleton,
                       gchar *obj_path)

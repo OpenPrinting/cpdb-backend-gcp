@@ -19,6 +19,14 @@ gcp_object_real_submit_print_job (GCPObject   *self,
                                   const gchar *access_token,
                                   const gchar *title,
                                   const gchar *ticket);
+
+const gchar *
+gcp_object_real_get_print_jobs (GCPObject *self,
+                                const gchar *access_token,
+                                const gchar *uid,
+                                const gchar *owner,
+                                const gchar *status,
+                                const gchar *sortorder);
 /*****************************************************************************/
 
 GCPObject *
@@ -40,9 +48,10 @@ gcp_object_class_init (GCPObjectClass *klass)
   klass->get_printers = gcp_object_real_get_printers;
   klass->get_printer_options = gcp_object_real_get_printer_options;
   klass->submit_print_job = gcp_object_real_submit_print_job;
+  klass->get_print_jobs = gcp_object_real_get_print_jobs;
 }
 
-GVariant *
+GHashTable *
 gcp_object_get_printers (GCPObject *self, const gchar *access_token, const gchar *connection_status)
 {
   g_return_val_if_fail (GCP_IS_OBJECT (self), NULL);
@@ -54,11 +63,10 @@ gcp_object_get_printers (GCPObject *self, const gchar *access_token, const gchar
   JsonArray *jarray = get_array_from_json_object (jobject, "printers");
   GHashTable *printer_id_name_pairs = get_ghashtable_for_id_and_value_in_json_array (jarray, "id", "displayName");
 
-  GVariant *g_variant = (GVariant *)printer_id_name_pairs;
-  return g_variant;
+  return printer_id_name_pairs;
 }
 
-GVariant *
+GHashTable *
 gcp_object_get_printer_options (GCPObject   *self,
                                 const gchar *uid,
                                 const gchar *access_token)
@@ -88,8 +96,7 @@ gcp_object_get_printer_options (GCPObject   *self,
   g_hash_table_insert (vendor_capability_hashtable, (gpointer)"vendor_capability_list", (gpointer)vendor_capability_list);
   g_hash_table_insert (vendor_capability_hashtable, (gpointer)"media_size_options_list", (gpointer)media_size_options_list);
 
-  GVariant *g_variant = (GVariant *)vendor_capability_hashtable;
-  return g_variant;
+  return vendor_capability_hashtable;
 }
 
 gboolean
@@ -106,6 +113,31 @@ gcp_object_submit_print_job (GCPObject   *self,
   res = klass->submit_print_job (self, uid, access_token, title, ticket);
 
   return res;
+}
+
+GList *
+gcp_object_get_print_jobs (GCPObject *self,
+                           const gchar *access_token,
+                           const gchar *uid,
+                           const gchar *owner,
+                           const gchar *status,
+                           const gchar *sortorder)
+{
+  g_return_val_if_fail (GCP_IS_OBJECT (self), NULL);
+
+  GCPObjectClass *klass = GCP_OBJECT_GET_CLASS (self);
+  const gchar *printer_jobs = klass->get_print_jobs (self,
+                                                     access_token,
+                                                     uid,
+                                                     owner,
+                                                     status,
+                                                     sortorder);
+
+  JsonObject *root = json_data_get_root (printer_jobs);
+  JsonArray *jarray = get_array_from_json_object (root, "jobs");
+  GList *jobs_list = get_print_jobs_list (jarray);
+
+  return jobs_list;
 }
 
 /*****************************************************************************/
@@ -195,4 +227,57 @@ gcp_object_real_submit_print_job (GCPObject   *self,
 {
   /* TODO: Make api request to submit a file for printing. */
   return TRUE;
+}
+
+const gchar *
+gcp_object_real_get_print_jobs (GCPObject *self,
+                                const gchar *access_token,
+                                const gchar *uid,
+                                const gchar *owner,
+                                const gchar *status,
+                                const gchar *sortorder)
+{
+  RestProxy *proxy;
+  RestProxyCall *call;
+
+  const gchar *header = "X-CloudPrint-Proxy";
+  const gchar *header_value = "Common Printing Dialog";
+  const gchar *method = "GET";
+  const gchar *function = "jobs";
+  const gchar *param_access_token = "access_token";
+  const gchar *param_printer_id = "printerid";
+  const gchar *param_owner = "owner";
+  const gchar *param_status = "status";
+  const gchar *param_sortorder = "sortorder";
+
+  gboolean res = FALSE;
+
+  proxy = rest_proxy_new ("https://www.google.com/cloudprint/", FALSE);
+  call = rest_proxy_new_call (proxy);
+  res = make_api_request (proxy,
+                          &call,
+                          method,
+                          function,
+                          header, header_value,
+                          param_access_token, access_token,
+                          param_printer_id, uid,
+                          param_owner, owner,
+                          param_status, status,
+                          param_sortorder, sortorder,
+                          NULL);
+
+  const gchar *printer_jobs;
+
+  if (res)
+  {
+    printer_jobs = rest_proxy_call_get_payload (call);
+  }
+  else
+  {
+    printer_jobs = g_strdup("API request failed!");
+  }
+
+  /* TODO: Error handling in case something goes wrong. */
+
+  return printer_jobs;
 }
