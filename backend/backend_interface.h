@@ -104,6 +104,15 @@ struct _PrintBackendIface
     GDBusMethodInvocation *invocation,
     const gchar *arg_printer_name);
 
+  gboolean (*handle_get_print_jobs) (
+    PrintBackend *object,
+    GDBusMethodInvocation *invocation,
+    const gchar *arg_access_token,
+    const gchar *arg_uid,
+    const gchar *arg_owner,
+    const gchar *arg_status,
+    const gchar *arg_sortorder);
+
   gboolean (*handle_get_printer_capabilities) (
     PrintBackend *object,
     GDBusMethodInvocation *invocation,
@@ -366,6 +375,11 @@ void print_backend_complete_submit_print_job (
     PrintBackend *object,
     GDBusMethodInvocation *invocation,
     gboolean status);
+
+void print_backend_complete_get_print_jobs (
+    PrintBackend *object,
+    GDBusMethodInvocation *invocation,
+    GVariant *print_jobs);
 
 
 
@@ -1014,6 +1028,34 @@ gboolean print_backend_call_submit_print_job_sync (
     const gchar *arg_title,
     const gchar *arg_ticket,
     gboolean *out_status,
+    GCancellable *cancellable,
+    GError **error);
+
+void print_backend_call_get_print_jobs (
+    PrintBackend *proxy,
+    const gchar *arg_access_token,
+    const gchar *arg_uid,
+    const gchar *arg_owner,
+    const gchar *arg_status,
+    const gchar *arg_sortorder,
+    GCancellable *cancellable,
+    GAsyncReadyCallback callback,
+    gpointer user_data);
+
+gboolean print_backend_call_get_print_jobs_finish (
+    PrintBackend *proxy,
+    GVariant **out_print_jobs,
+    GAsyncResult *res,
+    GError **error);
+
+gboolean print_backend_call_get_print_jobs_sync (
+    PrintBackend *proxy,
+    const gchar *arg_access_token,
+    const gchar *arg_uid,
+    const gchar *arg_owner,
+    const gchar *arg_status,
+    const gchar *arg_sortorder,
+    GVariant **out_print_jobs,
     GCancellable *cancellable,
     GError **error);
 

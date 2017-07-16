@@ -49,6 +49,16 @@ on_handle_submit_print_job (PrintBackend *skeleton,
                             const gchar *ticket,
                             gpointer user_data);
 
+static gboolean
+on_handle_get_print_jobs   (PrintBackend *skeleton,
+                            GDBusMethodInvocation *invocation,
+                            const gchar *access_token,
+                            const gchar *uid,
+                            const gchar *owner,
+                            const gchar *status,
+                            const gchar *sortorder,
+                            gpointer user_data);
+
 void connect_to_signals (PrintBackend *skeleton);
 
 

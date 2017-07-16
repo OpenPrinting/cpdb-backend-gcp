@@ -169,6 +169,14 @@
           <arg name="ticket" direction="in" type="s" />
           <arg name="status" direction="out" type="b" />
         </method>
+        <method name="getPrintJobs">
+          <arg name="access_token" direction="in" type="s" />
+          <arg name="uid" direction="in" type="s" />
+          <arg name="owner" direction="in" type="s" />
+          <arg name="status" direction="in" type="s" />
+          <arg name="sortorder" direction="in" type="s" />
+          <arg name="print_jobs" direction="out" type="v" />          
+        </method>
 
     </interface>
 </node>

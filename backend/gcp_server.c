@@ -68,6 +68,11 @@ connect_to_signals (PrintBackend *skeleton)
                     "handle_submit_print_job",
                     G_CALLBACK (on_handle_submit_print_job),
                     NULL);
+
+  g_signal_connect (skeleton,
+                    "handle_get_print_jobs",
+                    G_CALLBACK (on_handle_get_print_jobs),
+                    NULL);
 }
 
 static gboolean
@@ -80,26 +85,26 @@ on_handle_get_printers (PrintBackend *skeleton,
 {
   g_print ("on_handle_get_printers() called\n");
   GCPObject *gcp = gcp_object_new ();
-  GVariant *printers = gcp_object_get_printers (gcp,
-                                                access_token,
-                                                connection_status);
+  GHashTable *printers = gcp_object_get_printers (gcp,
+                                                  access_token,
+                                                  connection_status);
 
   g_assert (printers != NULL);
 
 /******************************************************************************/
   GHashTableIter iter;
   gpointer key, value;
-  GHashTable *printers_hashtable = (GHashTable *)printers;
-  g_hash_table_iter_init (&iter, printers_hashtable);
+  g_hash_table_iter_init (&iter, printers);
   while (g_hash_table_iter_next (&iter, &key, &value))
   {
       g_print ("%s => %s\n\n", (gchar *)key, (gchar *)value);
   }
 /******************************************************************************/
 
+  GVariant *printers_variant;
   print_backend_complete_get_printers (skeleton,
                                        invocation,
-                                       printers);
+                                       printers_variant);
 
   g_object_unref (gcp);
   return TRUE;
@@ -113,14 +118,15 @@ on_handle_get_printer_options (PrintBackend *skeleton,
                                gpointer user_data)
 {
   GCPObject *gcp = gcp_object_new ();
-  GVariant *printer_options = gcp_object_get_printer_options(gcp,
-                                                             uid,
-                                                             access_token);
+  GHashTable *printer_options = gcp_object_get_printer_options(gcp,
+                                                               uid,
+                                                               access_token);
 
   g_assert (printer_options != NULL);
+  GVariant *printer_options_variant;
   print_backend_complete_get_printer_options (skeleton,
                                               invocation,
-                                              printer_options);
+                                              printer_options_variant);
 
   g_object_unref (gcp);
   return TRUE;
@@ -137,4 +143,18 @@ on_handle_submit_print_job (PrintBackend *skeleton,
 {
   /* TODO: Implement on_handle_submit_print_job() */
   return FALSE;
+}
+
+static gboolean
+on_handle_get_print_jobs   (PrintBackend *skeleton,
+                            GDBusMethodInvocation *invocation,
+                            const gchar *access_token,
+                            const gchar *uid,
+                            const gchar *owner,
+                            const gchar *status,
+                            const gchar *sortorder,
+                            gpointer user_data)
+{
+  /* TODO: Implement on_handle_get_print_jobs() */
+  return TRUE;
 }
