@@ -73,11 +73,11 @@ GList *get_glist_for_string_member_in_json_array (JsonArray *jarray,
   return glist;
 }
 
-GHashTable *get_ghashtable_for_id_and_value_in_json_array (JsonArray *jarray,
-                                                           const gchar *id,
-                                                           const gchar *name)
+GList *get_printer_struct_from_json_array (JsonArray *jarray,
+                                           const gchar *id,
+                                           const gchar *name)
 {
-  GHashTable *ghashtable = g_hash_table_new (NULL, NULL);
+  GList *printer_structs_list = NULL;
   GList *jnodes = json_array_get_elements (jarray);
   while (jnodes != NULL)
   {
@@ -87,11 +87,16 @@ GHashTable *get_ghashtable_for_id_and_value_in_json_array (JsonArray *jarray,
     g_assert (json_object_has_member (jobject, name) == TRUE);
     const gchar *id_ = json_object_get_string_member (jobject, id);
     const gchar *name_ = json_object_get_string_member (jobject, name);
-    g_hash_table_insert (ghashtable, (gpointer *)id_, (gpointer *)name_);
+
+    printer *printer_struct = g_malloc(sizeof (printer));
+    printer_struct->id = g_strdup(id_);
+    printer_struct->name = g_strdup(name_);
+    printer_structs_list = g_list_append (printer_structs_list, (gpointer)printer_struct);
     jnodes = jnodes->next;
   }
-  return ghashtable;
+  return printer_structs_list;
 }
+
 
 gboolean get_access_token (gchar **out_access_token,
                            gint *out_expires_in,

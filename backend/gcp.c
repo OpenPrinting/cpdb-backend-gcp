@@ -51,7 +51,7 @@ gcp_object_class_init (GCPObjectClass *klass)
   klass->get_print_jobs = gcp_object_real_get_print_jobs;
 }
 
-GHashTable *
+GList *
 gcp_object_get_printers (GCPObject *self, const gchar *access_token, const gchar *connection_status)
 {
   g_return_val_if_fail (GCP_IS_OBJECT (self), NULL);
@@ -61,15 +61,42 @@ gcp_object_get_printers (GCPObject *self, const gchar *access_token, const gchar
 
   JsonObject *jobject = json_data_get_root (printers);
   JsonArray *jarray = get_array_from_json_object (jobject, "printers");
-  GHashTable *printer_id_name_pairs = get_ghashtable_for_id_and_value_in_json_array (jarray, "id", "displayName");
+  GList *printer_id_name_pairs = get_printer_struct_from_json_array (jarray, "id", "displayName");
 
   return printer_id_name_pairs;
 }
 
-GHashTable *
-gcp_object_get_printer_options (GCPObject   *self,
-                                const gchar *uid,
-                                const gchar *access_token)
+GList *
+gcp_object_get_media_size_options (GCPObject   *self,
+                                   const gchar *uid,
+                                   const gchar *access_token)
+{
+  g_return_val_if_fail (GCP_IS_OBJECT (self), NULL);
+
+  GCPObjectClass *klass = GCP_OBJECT_GET_CLASS (self);
+  const gchar *printer_options_json = klass->get_printer_options (self, uid, access_token);
+  JsonObject *root = json_data_get_root (printer_options_json);
+  JsonArray *jarray = get_array_from_json_object (root, "printers");
+  JsonNode *jnode = json_array_get_element (jarray, 0);
+  JsonObject *jobject = json_node_get_object (jnode);
+  JsonNode *capabilities_node = json_object_get_member (jobject, "capabilities");
+  JsonObject *capabilities_obj = json_node_get_object (capabilities_node);
+  JsonNode *printer_node = json_object_get_member (capabilities_obj, "printer");
+  JsonObject *printer_options = json_node_get_object (printer_node);
+
+  JsonNode *media_size_node = json_object_get_member (printer_options, "media_size");
+  JsonObject *media_size_object = json_node_get_object (media_size_node);
+  JsonArray *media_options_array = get_array_from_json_object (media_size_object, "option");
+
+  GList *media_size_options_list = get_media_size_options (media_options_array);
+
+  return media_size_options_list;
+}
+
+GList *
+gcp_object_get_vendor_capability_options (GCPObject   *self,
+                                          const gchar *uid,
+                                          const gchar *access_token)
 {
   g_return_val_if_fail (GCP_IS_OBJECT (self), NULL);
 
@@ -84,19 +111,10 @@ gcp_object_get_printer_options (GCPObject   *self,
   JsonNode *printer_node = json_object_get_member (capabilities_obj, "printer");
   JsonObject *printer_options = json_node_get_object (printer_node);
   JsonArray *vendor_capability_array = get_array_from_json_object (printer_options, "vendor_capability");
-  GHashTable *vendor_capability_hashtable = g_hash_table_new (NULL, NULL);
 
-  JsonNode *media_size_node = json_object_get_member (printer_options, "media_size");
-  JsonObject *media_size_object = json_node_get_object (media_size_node);
-  JsonArray *media_options_array = get_array_from_json_object (media_size_object, "option");
-
-  GList *media_size_options_list = get_media_size_options (media_options_array);
   GList *vendor_capability_list = get_vendor_capability_options (vendor_capability_array);
 
-  g_hash_table_insert (vendor_capability_hashtable, (gpointer)"vendor_capability_list", (gpointer)vendor_capability_list);
-  g_hash_table_insert (vendor_capability_hashtable, (gpointer)"media_size_options_list", (gpointer)media_size_options_list);
-
-  return vendor_capability_hashtable;
+  return vendor_capability_list;
 }
 
 gboolean

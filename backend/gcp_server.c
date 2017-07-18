@@ -85,26 +85,26 @@ on_handle_get_printers (PrintBackend *skeleton,
 {
   g_print ("on_handle_get_printers() called\n");
   GCPObject *gcp = gcp_object_new ();
-  GHashTable *printers = gcp_object_get_printers (gcp,
-                                                  access_token,
-                                                  connection_status);
+  GList *printers = gcp_object_get_printers (gcp,
+                                             access_token,
+                                             connection_status);
 
   g_assert (printers != NULL);
 
 /******************************************************************************/
-  GHashTableIter iter;
-  gpointer key, value;
-  g_hash_table_iter_init (&iter, printers);
-  while (g_hash_table_iter_next (&iter, &key, &value))
+  while(printers != NULL)
   {
-      g_print ("%s => %s\n\n", (gchar *)key, (gchar *)value);
+    printer *printer_struct = printers->data;
+    g_print ("id : %s\n", printer_struct->id);
+    g_print ("printerName : %s\n", printer_struct->name);
+
+    printers = printers->next;
   }
 /******************************************************************************/
 
-  GVariant *printers_variant;
-  print_backend_complete_get_printers (skeleton,
-                                       invocation,
-                                       printers_variant);
+  // print_backend_complete_get_printers (skeleton,
+  //                                      invocation,
+  //                                      printers_variant);
 
   g_object_unref (gcp);
   return TRUE;
@@ -118,15 +118,19 @@ on_handle_get_printer_options (PrintBackend *skeleton,
                                gpointer user_data)
 {
   GCPObject *gcp = gcp_object_new ();
-  GHashTable *printer_options = gcp_object_get_printer_options(gcp,
-                                                               uid,
-                                                               access_token);
 
-  g_assert (printer_options != NULL);
-  GVariant *printer_options_variant;
-  print_backend_complete_get_printer_options (skeleton,
-                                              invocation,
-                                              printer_options_variant);
+  GList *media_size_list = gcp_object_get_media_size_options (gcp,
+                                                              uid,
+                                                              access_token);
+
+  GList *vendor_capability_options = gcp_object_get_vendor_capability_options (gcp,
+                                                                               uid,
+                                                                               access_token);
+
+  // print_backend_complete_get_printer_options (skeleton,
+  //                                             invocation,
+  //                                             media_options_variant,
+  //                                             vendor_capability_variant);
 
   g_object_unref (gcp);
   return TRUE;

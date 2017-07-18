@@ -160,7 +160,8 @@
         <method name="getPrinterOptions">
             <arg name="uid" direction="in" type="s" />
             <arg name="access_token" direction="in" type="s"/>
-            <arg name="printer_options" direction="out" type="v"/>
+            <arg name="media_options" direction="out" type="v"/>
+            <arg name="vendor_capability" direction="out" type="v"/>
         </method>
         <method name="submitPrintJob">
           <arg name="uid" direction="in" type="s" />
@@ -175,7 +176,7 @@
           <arg name="owner" direction="in" type="s" />
           <arg name="status" direction="in" type="s" />
           <arg name="sortorder" direction="in" type="s" />
-          <arg name="print_jobs" direction="out" type="v" />          
+          <arg name="print_jobs" direction="out" type="v" />
         </method>
 
     </interface>

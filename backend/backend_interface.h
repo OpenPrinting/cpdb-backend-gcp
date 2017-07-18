@@ -369,7 +369,8 @@ void print_backend_complete_get_printers (
 void print_backend_complete_get_printer_options (
     PrintBackend *object,
     GDBusMethodInvocation *invocation,
-    GVariant *printer_options);
+    GVariant *media_options,
+    GVariant *vendor_capability);
 
 void print_backend_complete_submit_print_job (
     PrintBackend *object,
@@ -993,7 +994,8 @@ void print_backend_call_get_printer_options (
 
 gboolean print_backend_call_get_printer_options_finish (
     PrintBackend *proxy,
-    GVariant **out_printer_options,
+    GVariant **out_media_options,
+    GVariant **out_vendor_capability,
     GAsyncResult *res,
     GError **error);
 
@@ -1001,7 +1003,8 @@ gboolean print_backend_call_get_printer_options_sync (
     PrintBackend *proxy,
     const gchar *arg_uid,
     const gchar *arg_access_token,
-    GVariant **out_printer_options,
+    GVariant **out_media_options,
+    GVariant **out_vendor_capability,
     GCancellable *cancellable,
     GError **error);
 

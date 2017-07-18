@@ -1688,11 +1688,22 @@ static const _ExtendedGDBusArgInfo * const _print_backend_method_info_get_printe
   NULL
 };
 
-static const _ExtendedGDBusArgInfo _print_backend_method_info_get_printer_options_OUT_ARG_printer_options =
+static const _ExtendedGDBusArgInfo _print_backend_method_info_get_printer_options_OUT_ARG_media_options =
 {
   {
     -1,
-    (gchar *) "printer_options",
+    (gchar *) "media_options",
+    (gchar *) "v",
+    NULL
+  },
+  FALSE
+};
+
+static const _ExtendedGDBusArgInfo _print_backend_method_info_get_printer_options_OUT_ARG_vendor_capability =
+{
+  {
+    -1,
+    (gchar *) "vendor_capability",
     (gchar *) "v",
     NULL
   },
@@ -1701,7 +1712,8 @@ static const _ExtendedGDBusArgInfo _print_backend_method_info_get_printer_option
 
 static const _ExtendedGDBusArgInfo * const _print_backend_method_info_get_printer_options_OUT_ARG_pointers[] =
 {
-  &_print_backend_method_info_get_printer_options_OUT_ARG_printer_options,
+  &_print_backend_method_info_get_printer_options_OUT_ARG_media_options,
+  &_print_backend_method_info_get_printer_options_OUT_ARG_vendor_capability,
   NULL
 };
 
@@ -5930,7 +5942,8 @@ print_backend_call_get_printer_options (
 /**
  * print_backend_call_get_printer_options_finish:
  * @proxy: A #PrintBackendProxy.
- * @out_printer_options: (out): Return location for return parameter or %NULL to ignore.
+ * @out_media_options: (out): Return location for return parameter or %NULL to ignore.
+ * @out_vendor_capability: (out): Return location for return parameter or %NULL to ignore.
  * @res: The #GAsyncResult obtained from the #GAsyncReadyCallback passed to print_backend_call_get_printer_options().
  * @error: Return location for error or %NULL.
  *
@@ -5941,7 +5954,8 @@ print_backend_call_get_printer_options (
 gboolean
 print_backend_call_get_printer_options_finish (
     PrintBackend *proxy,
-    GVariant **out_printer_options,
+    GVariant **out_media_options,
+    GVariant **out_vendor_capability,
     GAsyncResult *res,
     GError **error)
 {
@@ -5950,8 +5964,9 @@ print_backend_call_get_printer_options_finish (
   if (_ret == NULL)
     goto _out;
   g_variant_get (_ret,
-                 "(@v)",
-                 out_printer_options);
+                 "(@v@v)",
+                 out_media_options,
+                 out_vendor_capability);
   g_variant_unref (_ret);
 _out:
   return _ret != NULL;
@@ -5962,7 +5977,8 @@ _out:
  * @proxy: A #PrintBackendProxy.
  * @arg_uid: Argument to pass with the method invocation.
  * @arg_access_token: Argument to pass with the method invocation.
- * @out_printer_options: (out): Return location for return parameter or %NULL to ignore.
+ * @out_media_options: (out): Return location for return parameter or %NULL to ignore.
+ * @out_vendor_capability: (out): Return location for return parameter or %NULL to ignore.
  * @cancellable: (allow-none): A #GCancellable or %NULL.
  * @error: Return location for error or %NULL.
  *
@@ -5977,7 +5993,8 @@ print_backend_call_get_printer_options_sync (
     PrintBackend *proxy,
     const gchar *arg_uid,
     const gchar *arg_access_token,
-    GVariant **out_printer_options,
+    GVariant **out_media_options,
+    GVariant **out_vendor_capability,
     GCancellable *cancellable,
     GError **error)
 {
@@ -5994,8 +6011,9 @@ print_backend_call_get_printer_options_sync (
   if (_ret == NULL)
     goto _out;
   g_variant_get (_ret,
-                 "(@v)",
-                 out_printer_options);
+                 "(@v@v)",
+                 out_media_options,
+                 out_vendor_capability);
   g_variant_unref (_ret);
 _out:
   return _ret != NULL;
@@ -6864,7 +6882,8 @@ print_backend_complete_get_printers (
  * print_backend_complete_get_printer_options:
  * @object: A #PrintBackend.
  * @invocation: (transfer full): A #GDBusMethodInvocation.
- * @printer_options: Parameter to return.
+ * @media_options: Parameter to return.
+ * @vendor_capability: Parameter to return.
  *
  * Helper function used in service implementations to finish handling invocations of the <link linkend="gdbus-method-org-openprinting-PrintBackend.getPrinterOptions">getPrinterOptions()</link> D-Bus method. If you instead want to finish handling an invocation by returning an error, use g_dbus_method_invocation_return_error() or similar.
  *
@@ -6874,11 +6893,13 @@ void
 print_backend_complete_get_printer_options (
     PrintBackend *object,
     GDBusMethodInvocation *invocation,
-    GVariant *printer_options)
+    GVariant *media_options,
+    GVariant *vendor_capability)
 {
   g_dbus_method_invocation_return_value (invocation,
-    g_variant_new ("(@v)",
-                   printer_options));
+    g_variant_new ("(@v@v)",
+                   media_options,
+                   vendor_capability));
 }
 
 /**
