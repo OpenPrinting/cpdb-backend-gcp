@@ -1693,7 +1693,7 @@ static const _ExtendedGDBusArgInfo _print_backend_method_info_get_printer_option
   {
     -1,
     (gchar *) "media_options",
-    (gchar *) "v",
+    (gchar *) "a{sv}",
     NULL
   },
   FALSE
@@ -1704,7 +1704,7 @@ static const _ExtendedGDBusArgInfo _print_backend_method_info_get_printer_option
   {
     -1,
     (gchar *) "vendor_capability",
-    (gchar *) "v",
+    (gchar *) "a{sv}",
     NULL
   },
   FALSE
@@ -1883,7 +1883,7 @@ static const _ExtendedGDBusArgInfo _print_backend_method_info_get_print_jobs_OUT
   {
     -1,
     (gchar *) "print_jobs",
-    (gchar *) "v",
+    (gchar *) "a{sv}",
     NULL
   },
   FALSE
@@ -5964,7 +5964,7 @@ print_backend_call_get_printer_options_finish (
   if (_ret == NULL)
     goto _out;
   g_variant_get (_ret,
-                 "(@v@v)",
+                 "(@a{sv}@a{sv})",
                  out_media_options,
                  out_vendor_capability);
   g_variant_unref (_ret);
@@ -6011,7 +6011,7 @@ print_backend_call_get_printer_options_sync (
   if (_ret == NULL)
     goto _out;
   g_variant_get (_ret,
-                 "(@v@v)",
+                 "(@a{sv}@a{sv})",
                  out_media_options,
                  out_vendor_capability);
   g_variant_unref (_ret);
@@ -6209,7 +6209,7 @@ print_backend_call_get_print_jobs_finish (
   if (_ret == NULL)
     goto _out;
   g_variant_get (_ret,
-                 "(@v)",
+                 "(@a{sv})",
                  out_print_jobs);
   g_variant_unref (_ret);
 _out:
@@ -6262,7 +6262,7 @@ print_backend_call_get_print_jobs_sync (
   if (_ret == NULL)
     goto _out;
   g_variant_get (_ret,
-                 "(@v)",
+                 "(@a{sv})",
                  out_print_jobs);
   g_variant_unref (_ret);
 _out:
@@ -6897,7 +6897,7 @@ print_backend_complete_get_printer_options (
     GVariant *vendor_capability)
 {
   g_dbus_method_invocation_return_value (invocation,
-    g_variant_new ("(@v@v)",
+    g_variant_new ("(@a{sv}@a{sv})",
                    media_options,
                    vendor_capability));
 }
@@ -6940,7 +6940,7 @@ print_backend_complete_get_print_jobs (
     GVariant *print_jobs)
 {
   g_dbus_method_invocation_return_value (invocation,
-    g_variant_new ("(@v)",
+    g_variant_new ("(@a{sv})",
                    print_jobs));
 }
 
