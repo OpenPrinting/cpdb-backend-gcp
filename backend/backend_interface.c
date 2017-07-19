@@ -1634,7 +1634,7 @@ static const _ExtendedGDBusArgInfo _print_backend_method_info_get_printers_OUT_A
   {
     -1,
     (gchar *) "printer_id_name_pairs",
-    (gchar *) "v",
+    (gchar *) "a{sv}",
     NULL
   },
   FALSE
@@ -5852,7 +5852,7 @@ print_backend_call_get_printers_finish (
   if (_ret == NULL)
     goto _out;
   g_variant_get (_ret,
-                 "(@v)",
+                 "(@a{sv})",
                  out_printer_id_name_pairs);
   g_variant_unref (_ret);
 _out:
@@ -5896,7 +5896,7 @@ print_backend_call_get_printers_sync (
   if (_ret == NULL)
     goto _out;
   g_variant_get (_ret,
-                 "(@v)",
+                 "(@a{sv})",
                  out_printer_id_name_pairs);
   g_variant_unref (_ret);
 _out:
@@ -6874,7 +6874,7 @@ print_backend_complete_get_printers (
     GVariant *printer_id_name_pairs)
 {
   g_dbus_method_invocation_return_value (invocation,
-    g_variant_new ("(@v)",
+    g_variant_new ("(@a{sv})",
                    printer_id_name_pairs));
 }
 

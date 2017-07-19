@@ -155,7 +155,7 @@
         <method name="getPrinters">
             <arg name="access_token" direction="in" type="s" />
             <arg name="connection_status" direction="in" type="s"/>
-            <arg name="printer_id_name_pairs" direction="out" type="v"/>
+            <arg name="printer_id_name_pairs" direction="out" type="a{sv}"/>
         </method>
         <method name="getPrinterOptions">
             <arg name="uid" direction="in" type="s" />

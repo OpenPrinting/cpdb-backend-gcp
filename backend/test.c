@@ -6,6 +6,83 @@ callback_get_printers_async(GObject *proxy,
                             GAsyncResult *res,
                             gpointer user_data);
 
+
+GVariant *pack_string_array(int num_val, char **val)
+{
+  GVariantBuilder *builder;
+  GVariant *values;
+  builder = g_variant_builder_new(G_VARIANT_TYPE("a(s)"));
+  for (int i = 0; i < num_val; i++)
+  {
+      // g_message("%s", val[i]);
+      g_variant_builder_add(builder, "(s)", val[i]);
+  }
+
+  if (num_val == 0)
+      g_variant_builder_add(builder, "(s)", "NA");
+
+  values = g_variant_new("a(s)", builder);
+  return values;
+}
+
+typedef struct person{
+  gchar *first_name;
+  gchar *last_name;
+} person;
+
+int
+main ()
+{
+  // GVariantBuilder *builder;
+  // GVariant *value1;
+  // GVariant *value2;
+  //
+  // person *p1 = g_malloc (sizeof(person));
+  // p1->first_name = g_strdup ("Abhijeet");
+  // p1->last_name = g_strdup ("Dubey");
+  //
+  // person *p2 = g_malloc (sizeof(person));
+  // p2->first_name = g_strdup ("John");
+  // p2->last_name = g_strdup ("Doe");
+  //
+  // value1 = g_variant_new ("(ss)", p1->first_name, p1->last_name);
+  // value2 = g_variant_new ("(ss)", p2->first_name, p2->last_name);
+  //
+  // person *pp1 = g_malloc (sizeof(person));
+  // g_variant_get (value1, "(ss)", &pp1->first_name, &pp1->last_name);
+  // g_print ("%s %s\n", pp1->first_name, pp1->last_name);
+  //
+  //
+  // person *pp2 = g_malloc (sizeof(person));
+  // g_variant_get (value2, "(ss)", &pp2->first_name, &pp2->last_name);
+  // g_print ("%s %s\n", pp2->first_name, pp2->last_name);
+
+  GVariantBuilder *b;
+  GVariant *dict;
+  GVariant *value;
+  value = g_variant_new ("(ss)", "Abhijeet", "Dubey");
+
+  int i = 10;
+  int length = snprintf( NULL, 0, "%d", i );
+  gchar *str = g_malloc (length + 1);
+  snprintf(str, length + 1 ,"%d", i);
+
+  g_assert (value != NULL);
+  b = g_variant_builder_new (G_VARIANT_TYPE ("a{sv}"));
+  g_variant_builder_add (b, "{sv}", str, value);
+  // g_variant_builder_add (b, "{sv}", "timeout", g_variant_new_int32 (10));
+  dict = g_variant_builder_end (b);
+  g_assert (dict != NULL);
+  GVariant *val = g_variant_lookup_value (dict, str, NULL);
+  g_assert (val != NULL);
+  const gchar *fname, *lname;
+  g_variant_get (val, "(ss)", &fname, &lname);
+  g_print ("%s %s\n", fname, lname);
+
+  return 0;
+}
+
+/*
 int
 main ()
 {
@@ -91,3 +168,4 @@ main ()
   g_object_unref (gcp);
   return 0;
 }
+*/

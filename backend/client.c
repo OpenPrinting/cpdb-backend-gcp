@@ -15,7 +15,7 @@ main ()
   gint expires_in;
   gboolean res = get_access_token (&access_token, &expires_in, &error);
   g_assert (res == TRUE);
-  g_print ("%s\n", access_token);
+  // g_print ("%s\n", access_token);
 
   PrintBackend *proxy;
   // GVariant *retval;
@@ -37,14 +37,21 @@ callback_get_printers_async(GObject *proxy,
                             gpointer user_data)
 {
     g_print("callback_get_printers_async called!\n");
-    GVariant *retval;
+    GVariant *dict = g_variant_new ("a{sv}");
     GError *error;
     error = NULL;
-    print_backend_call_get_printers_finish(PRINT_BACKEND(proxy), &retval, res, &error);
+    print_backend_call_get_printers_finish(PRINT_BACKEND(proxy), &dict, res, &error);
+    // GVariant *val = g_variant_lookup_value (dict, "0", NULL);
+    // g_assert (val != NULL);
+    // const gchar *id, *name;
+    // g_variant_get (val, "(ss)", &id, &name);
+    // g_print ("%s %s\n", id, name);
+    // g_print ("hello\n");
+
 
     if (error == NULL)
     {
-      g_assert (retval != NULL);
+      g_assert (dict != NULL);
     }
     else
       g_print("%s\n", error->message);

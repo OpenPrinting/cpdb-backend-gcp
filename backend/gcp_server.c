@@ -90,21 +90,41 @@ on_handle_get_printers (PrintBackend *skeleton,
                                              connection_status);
 
   g_assert (printers != NULL);
+  guint printer_list_len = g_list_length (printers);
+  guint length = snprintf(NULL, 0, "%d", printer_list_len);
 
 /******************************************************************************/
+  // This block is only for testing purpose. Remove this block in final release.
+  // GList *printers_ = printers;
+  // while(printers_ != NULL)
+  // {
+  //   printer *printer_struct = printers_->data;
+  //   g_print ("id : %s\n", printer_struct->id);
+  //   g_print ("printerName : %s\n", printer_struct->name);
+  //
+  //   printers_ = printers_->next;
+  // }
+/******************************************************************************/
+
+  GVariantBuilder *builder;
+  GVariant *dict;
+  builder = g_variant_builder_new (G_VARIANT_TYPE ("a{sv}"));
+  int i = 0;
   while(printers != NULL)
   {
+    gchar *key = g_malloc (length + 1);
+    snprintf(key, length + 1 ,"%d", i);
     printer *printer_struct = printers->data;
-    g_print ("id : %s\n", printer_struct->id);
-    g_print ("printerName : %s\n", printer_struct->name);
-
+    GVariant *value = g_variant_new ("(ss)", printer_struct->id, printer_struct->name);
+    g_variant_builder_add (builder, "{sv}", key, value);
     printers = printers->next;
+    i++;
   }
-/******************************************************************************/
 
-  // print_backend_complete_get_printers (skeleton,
-  //                                      invocation,
-  //                                      printers_variant);
+  dict = g_variant_builder_end (builder);
+  print_backend_complete_get_printers (skeleton,
+                                       invocation,
+                                       dict);
 
   g_object_unref (gcp);
   return TRUE;
