@@ -6,7 +6,7 @@ all: client server test
 gen:genback
 
 genback:
-	gdbus-codegen --generate-c-code backend_interface  --interface-prefix org.openprinting org.openprinting.Backend.xml
+	gdbus-codegen --generate-c-code backend_interface  --interface-prefix org.openprinting ../interface/org.openprinting.Backend.xml
 
 %.o: %.c
 	gcc -g -o $@ $^ -c $(FLAGS)

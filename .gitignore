@@ -33,3 +33,6 @@
 
 # Backup
 *.bak
+
+# JSON
+*.json
