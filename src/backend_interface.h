@@ -90,7 +90,7 @@ struct _PrintBackendIface
   gboolean (*handle_get_printer_state) (
     PrintBackend *object,
     GDBusMethodInvocation *invocation,
-    const gchar *arg_printer_name);
+    const gchar *arg_printer_id);
 
   gboolean (*handle_get_quality) (
     PrintBackend *object,
@@ -355,7 +355,7 @@ gboolean print_backend_call_get_default_printer_sync (
 
 void print_backend_call_get_printer_state (
     PrintBackend *proxy,
-    const gchar *arg_printer_name,
+    const gchar *arg_printer_id,
     GCancellable *cancellable,
     GAsyncReadyCallback callback,
     gpointer user_data);
@@ -368,7 +368,7 @@ gboolean print_backend_call_get_printer_state_finish (
 
 gboolean print_backend_call_get_printer_state_sync (
     PrintBackend *proxy,
-    const gchar *arg_printer_name,
+    const gchar *arg_printer_id,
     gchar **out_state,
     GCancellable *cancellable,
     GError **error);

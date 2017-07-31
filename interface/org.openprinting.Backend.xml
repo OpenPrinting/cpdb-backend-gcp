@@ -22,7 +22,7 @@
             <arg name="printer_name" direction="out" type="s"/>
         </method>
         <method name="getPrinterState">
-            <arg name="printer_name" direction="in" type="s"/>
+            <arg name="printer_id" direction="in" type="s"/>
             <arg name="state" direction="out" type="s"/>
         </method>
         <method name="isAcceptingJobs">
