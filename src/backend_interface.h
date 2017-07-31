@@ -126,7 +126,7 @@ struct _PrintBackendIface
   gboolean (*handle_is_accepting_jobs) (
     PrintBackend *object,
     GDBusMethodInvocation *invocation,
-    const gchar *arg_printer_name);
+    const gchar *arg_printer_id);
 
   gboolean (*handle_ping) (
     PrintBackend *object,
@@ -375,7 +375,7 @@ gboolean print_backend_call_get_printer_state_sync (
 
 void print_backend_call_is_accepting_jobs (
     PrintBackend *proxy,
-    const gchar *arg_printer_name,
+    const gchar *arg_printer_id,
     GCancellable *cancellable,
     GAsyncReadyCallback callback,
     gpointer user_data);
@@ -388,7 +388,7 @@ gboolean print_backend_call_is_accepting_jobs_finish (
 
 gboolean print_backend_call_is_accepting_jobs_sync (
     PrintBackend *proxy,
-    const gchar *arg_printer_name,
+    const gchar *arg_printer_id,
     gboolean *out_is_accepting,
     GCancellable *cancellable,
     GError **error);

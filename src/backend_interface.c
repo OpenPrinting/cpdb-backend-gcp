@@ -283,11 +283,11 @@ static const _ExtendedGDBusMethodInfo _print_backend_method_info_get_printer_sta
   FALSE
 };
 
-static const _ExtendedGDBusArgInfo _print_backend_method_info_is_accepting_jobs_IN_ARG_printer_name =
+static const _ExtendedGDBusArgInfo _print_backend_method_info_is_accepting_jobs_IN_ARG_printer_id =
 {
   {
     -1,
-    (gchar *) "printer_name",
+    (gchar *) "printer_id",
     (gchar *) "s",
     NULL
   },
@@ -296,7 +296,7 @@ static const _ExtendedGDBusArgInfo _print_backend_method_info_is_accepting_jobs_
 
 static const _ExtendedGDBusArgInfo * const _print_backend_method_info_is_accepting_jobs_IN_ARG_pointers[] =
 {
-  &_print_backend_method_info_is_accepting_jobs_IN_ARG_printer_name,
+  &_print_backend_method_info_is_accepting_jobs_IN_ARG_printer_id,
   NULL
 };
 
@@ -1612,7 +1612,7 @@ print_backend_default_init (PrintBackendIface *iface)
    * PrintBackend::handle-is-accepting-jobs:
    * @object: A #PrintBackend.
    * @invocation: A #GDBusMethodInvocation.
-   * @arg_printer_name: Argument passed by remote caller.
+   * @arg_printer_id: Argument passed by remote caller.
    *
    * Signal emitted when a remote caller is invoking the <link linkend="gdbus-method-org-openprinting-PrintBackend.isAcceptingJobs">isAcceptingJobs()</link> D-Bus method.
    *
@@ -2514,7 +2514,7 @@ _out:
 /**
  * print_backend_call_is_accepting_jobs:
  * @proxy: A #PrintBackendProxy.
- * @arg_printer_name: Argument to pass with the method invocation.
+ * @arg_printer_id: Argument to pass with the method invocation.
  * @cancellable: (allow-none): A #GCancellable or %NULL.
  * @callback: A #GAsyncReadyCallback to call when the request is satisfied or %NULL.
  * @user_data: User data to pass to @callback.
@@ -2528,7 +2528,7 @@ _out:
 void
 print_backend_call_is_accepting_jobs (
     PrintBackend *proxy,
-    const gchar *arg_printer_name,
+    const gchar *arg_printer_id,
     GCancellable *cancellable,
     GAsyncReadyCallback callback,
     gpointer user_data)
@@ -2536,7 +2536,7 @@ print_backend_call_is_accepting_jobs (
   g_dbus_proxy_call (G_DBUS_PROXY (proxy),
     "isAcceptingJobs",
     g_variant_new ("(s)",
-                   arg_printer_name),
+                   arg_printer_id),
     G_DBUS_CALL_FLAGS_NONE,
     -1,
     cancellable,
@@ -2577,7 +2577,7 @@ _out:
 /**
  * print_backend_call_is_accepting_jobs_sync:
  * @proxy: A #PrintBackendProxy.
- * @arg_printer_name: Argument to pass with the method invocation.
+ * @arg_printer_id: Argument to pass with the method invocation.
  * @out_is_accepting: (out): Return location for return parameter or %NULL to ignore.
  * @cancellable: (allow-none): A #GCancellable or %NULL.
  * @error: Return location for error or %NULL.
@@ -2591,7 +2591,7 @@ _out:
 gboolean
 print_backend_call_is_accepting_jobs_sync (
     PrintBackend *proxy,
-    const gchar *arg_printer_name,
+    const gchar *arg_printer_id,
     gboolean *out_is_accepting,
     GCancellable *cancellable,
     GError **error)
@@ -2600,7 +2600,7 @@ print_backend_call_is_accepting_jobs_sync (
   _ret = g_dbus_proxy_call_sync (G_DBUS_PROXY (proxy),
     "isAcceptingJobs",
     g_variant_new ("(s)",
-                   arg_printer_name),
+                   arg_printer_id),
     G_DBUS_CALL_FLAGS_NONE,
     -1,
     cancellable,
