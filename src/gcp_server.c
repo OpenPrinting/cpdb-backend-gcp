@@ -89,6 +89,11 @@ connect_to_signals (PrintBackend *skeleton)
                     "handle_get_supported_resolution",
                     G_CALLBACK (on_handle_get_supported_resolution),
                     NULL);
+
+  g_signal_connect (skeleton,
+                    "handle_get_printer_state",
+                    G_CALLBACK (on_handle_get_printer_state),
+                    NULL);
 }
 
 // static gboolean
@@ -489,6 +494,33 @@ on_handle_get_supported_resolution (PrintBackend *skeleton,
                                                    invocation,
                                                    num_values,
                                                    supported_resolution_values);
+
+  g_object_unref (gcp);
+  return TRUE;
+}
+
+static gboolean
+on_handle_get_printer_state (PrintBackend *skeleton,
+                             GDBusMethodInvocation *invocation,
+                             const gchar *printer_id,
+                             gpointer user_data)
+{
+  g_print ("on_handle_get_printer_state() called\n");
+  GCPObject *gcp = gcp_object_new ();
+
+  GError *error = NULL;
+  gchar *access_token = g_malloc (150);
+  gint expires_in;
+  gboolean res = get_access_token (&access_token, &expires_in, &error);
+  g_assert (res == TRUE);
+
+  gchar *printer_state = gcp_object_get_printer_state (gcp,
+                                                       access_token,
+                                                       printer_id);
+
+  print_backend_complete_get_printer_state (skeleton,
+                                            invocation,
+                                            printer_state);
 
   g_object_unref (gcp);
   return TRUE;

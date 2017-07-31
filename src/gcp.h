@@ -80,6 +80,11 @@ gcp_object_get_print_jobs (GCPObject *self,
                            const gchar *status,
                            const gchar *sortorder);
 
+gchar *
+gcp_object_get_printer_state (GCPObject *self,
+                              const gchar *access_token,
+                              const gchar *uid);
+
 G_END_DECLS
 
 #endif

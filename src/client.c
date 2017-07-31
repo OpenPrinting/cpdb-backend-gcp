@@ -72,8 +72,16 @@ main ()
 
   g_variant_iter_free (iter);
 
-
   gchar *printer_id = g_malloc (50);
+  g_print ("Enter id of printer to get printer status:\n");
+  scanf ("%s", printer_id);
+  error = NULL;
+  gchar *printer_status;
+  print_backend_call_get_printer_state_sync (proxy, printer_id, &printer_status, NULL, &error);
+  g_print ("*******Printer Status*******\n");
+  g_print ("%s => %s\n\n", printer_id, printer_status);
+
+
   g_print ("Enter id of printer to get printer options:\n");
   scanf ("%s", printer_id);
 

@@ -299,3 +299,20 @@ gcp_object_real_get_print_jobs (GCPObject *self,
 
   return printer_jobs;
 }
+
+gchar *
+gcp_object_get_printer_state (GCPObject *self,
+                              const gchar *access_token,
+                              const gchar *uid)
+{
+  g_return_val_if_fail (GCP_IS_OBJECT (self), NULL);
+
+  GCPObjectClass *klass = GCP_OBJECT_GET_CLASS (self);
+  const gchar *printers = klass->get_printers (self, access_token, "ALL");
+
+  JsonObject *jobject = json_data_get_root (printers);
+  JsonArray *jarray = get_array_from_json_object (jobject, "printers");
+  gchar *printer_state = get_printer_state_from_printers_array (jarray, uid);
+
+  return printer_state;
+}

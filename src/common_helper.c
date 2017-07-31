@@ -287,3 +287,26 @@ void connect_to_dbus (GDBusConnection *connection,
                                    &error);
   g_assert_no_error(error);
 }
+
+gchar *get_printer_state_from_printers_array (JsonArray *jarray, const gchar *uid)
+{
+  GList *jnodes = json_array_get_elements (jarray);
+  gchar *printer_state;
+  while (jnodes != NULL)
+  {
+    JsonObject *jobject = json_node_get_object (jnodes->data);
+    g_assert (jobject != NULL);
+    g_assert (json_object_has_member (jobject, "id") == TRUE);
+    g_assert (json_object_has_member (jobject, "connectionStatus") == TRUE);
+    const gchar *id_ = json_object_get_string_member (jobject, "id");
+    const gchar *connectionStatus = json_object_get_string_member (jobject, "connectionStatus");
+
+    if(g_strcmp0 (id_, uid) == 0)
+    {
+      printer_state = g_strdup (connectionStatus);
+      break;
+    }
+    jnodes = jnodes->next;
+  }
+  return printer_state;
+}
