@@ -1,25 +1,24 @@
 <node>
     <interface name="org.openprinting.PrintBackend">
         <signal name="PrinterAdded">
+            <arg name="printer_id" direction="out" type="s"/>
             <arg name="printer_name" direction="out" type="s" />
             <arg name="printer_info" direction="out" type="s" />
             <arg name="printer_location" direction="out" type="s" />
             <arg name="printer_make_and_model" direction="out" type="s" />
-            <arg name="printer_uri" direction="out" type="s" />
             <arg name="printer_is_accepting_jobs" direction="out" type="b" />
             <arg name="printer_state" direction="out" type="s" />
             <arg name="backend_name" direction="out" type="s"/>
-            <!--<arg name="auth_info_reqd" direction="out" type="s"/> -->
         </signal>
         <signal name="PrinterRemoved">
-            <arg name="printer_name" type="s" />
+            <arg name="printer_id" type="s" />
         </signal>
         <method name="GetBackendName">
             <arg name="backend_name" direction="out" type="s" />
         </method>
         <method name="ActivateBackend"></method>
         <method name="getDefaultPrinter">
-            <arg name="printer_name" direction="out" type="s"/>
+            <arg name="printer_id" direction="out" type="s"/>
         </method>
         <method name="getPrinterState">
             <arg name="printer_id" direction="in" type="s"/>
@@ -53,6 +52,7 @@
         </method>
 
 
+        <!--The following are deprecated-->
         <method name="getDefaultMedia">
             <arg name="printer_id" direction="in" type="s" />
             <arg name="media_name" direction="out" type="s"/>
@@ -89,6 +89,7 @@
             <arg name="num_values" direction="out" type="i"/>
             <arg name="values" direction="out" type="a(s)" />
         </method>
+        <!--Just for testing-->
         <method name="ping">
             <arg name="printer_name" direction="in" type="s" />
         </method>

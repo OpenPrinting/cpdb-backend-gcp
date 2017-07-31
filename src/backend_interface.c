@@ -206,11 +206,11 @@ static const _ExtendedGDBusMethodInfo _print_backend_method_info_activate_backen
   FALSE
 };
 
-static const _ExtendedGDBusArgInfo _print_backend_method_info_get_default_printer_OUT_ARG_printer_name =
+static const _ExtendedGDBusArgInfo _print_backend_method_info_get_default_printer_OUT_ARG_printer_id =
 {
   {
     -1,
-    (gchar *) "printer_name",
+    (gchar *) "printer_id",
     (gchar *) "s",
     NULL
   },
@@ -219,7 +219,7 @@ static const _ExtendedGDBusArgInfo _print_backend_method_info_get_default_printe
 
 static const _ExtendedGDBusArgInfo * const _print_backend_method_info_get_default_printer_OUT_ARG_pointers[] =
 {
-  &_print_backend_method_info_get_default_printer_OUT_ARG_printer_name,
+  &_print_backend_method_info_get_default_printer_OUT_ARG_printer_id,
   NULL
 };
 
@@ -1283,6 +1283,17 @@ static const _ExtendedGDBusMethodInfo * const _print_backend_method_info_pointer
   NULL
 };
 
+static const _ExtendedGDBusArgInfo _print_backend_signal_info_printer_added_ARG_printer_id =
+{
+  {
+    -1,
+    (gchar *) "printer_id",
+    (gchar *) "s",
+    NULL
+  },
+  FALSE
+};
+
 static const _ExtendedGDBusArgInfo _print_backend_signal_info_printer_added_ARG_printer_name =
 {
   {
@@ -1327,17 +1338,6 @@ static const _ExtendedGDBusArgInfo _print_backend_signal_info_printer_added_ARG_
   FALSE
 };
 
-static const _ExtendedGDBusArgInfo _print_backend_signal_info_printer_added_ARG_printer_uri =
-{
-  {
-    -1,
-    (gchar *) "printer_uri",
-    (gchar *) "s",
-    NULL
-  },
-  FALSE
-};
-
 static const _ExtendedGDBusArgInfo _print_backend_signal_info_printer_added_ARG_printer_is_accepting_jobs =
 {
   {
@@ -1373,11 +1373,11 @@ static const _ExtendedGDBusArgInfo _print_backend_signal_info_printer_added_ARG_
 
 static const _ExtendedGDBusArgInfo * const _print_backend_signal_info_printer_added_ARG_pointers[] =
 {
+  &_print_backend_signal_info_printer_added_ARG_printer_id,
   &_print_backend_signal_info_printer_added_ARG_printer_name,
   &_print_backend_signal_info_printer_added_ARG_printer_info,
   &_print_backend_signal_info_printer_added_ARG_printer_location,
   &_print_backend_signal_info_printer_added_ARG_printer_make_and_model,
-  &_print_backend_signal_info_printer_added_ARG_printer_uri,
   &_print_backend_signal_info_printer_added_ARG_printer_is_accepting_jobs,
   &_print_backend_signal_info_printer_added_ARG_printer_state,
   &_print_backend_signal_info_printer_added_ARG_backend_name,
@@ -1395,11 +1395,11 @@ static const _ExtendedGDBusSignalInfo _print_backend_signal_info_printer_added =
   "printer-added"
 };
 
-static const _ExtendedGDBusArgInfo _print_backend_signal_info_printer_removed_ARG_printer_name =
+static const _ExtendedGDBusArgInfo _print_backend_signal_info_printer_removed_ARG_printer_id =
 {
   {
     -1,
-    (gchar *) "printer_name",
+    (gchar *) "printer_id",
     (gchar *) "s",
     NULL
   },
@@ -1408,7 +1408,7 @@ static const _ExtendedGDBusArgInfo _print_backend_signal_info_printer_removed_AR
 
 static const _ExtendedGDBusArgInfo * const _print_backend_signal_info_printer_removed_ARG_pointers[] =
 {
-  &_print_backend_signal_info_printer_removed_ARG_printer_name,
+  &_print_backend_signal_info_printer_removed_ARG_printer_id,
   NULL
 };
 
@@ -2031,11 +2031,11 @@ print_backend_default_init (PrintBackendIface *iface)
   /**
    * PrintBackend::printer-added:
    * @object: A #PrintBackend.
+   * @arg_printer_id: Argument.
    * @arg_printer_name: Argument.
    * @arg_printer_info: Argument.
    * @arg_printer_location: Argument.
    * @arg_printer_make_and_model: Argument.
-   * @arg_printer_uri: Argument.
    * @arg_printer_is_accepting_jobs: Argument.
    * @arg_printer_state: Argument.
    * @arg_backend_name: Argument.
@@ -2057,7 +2057,7 @@ print_backend_default_init (PrintBackendIface *iface)
   /**
    * PrintBackend::printer-removed:
    * @object: A #PrintBackend.
-   * @arg_printer_name: Argument.
+   * @arg_printer_id: Argument.
    *
    * On the client-side, this signal is emitted whenever the D-Bus signal <link linkend="gdbus-signal-org-openprinting-PrintBackend.PrinterRemoved">"PrinterRemoved"</link> is received.
    *
@@ -2078,11 +2078,11 @@ print_backend_default_init (PrintBackendIface *iface)
 /**
  * print_backend_emit_printer_added:
  * @object: A #PrintBackend.
+ * @arg_printer_id: Argument to pass with the signal.
  * @arg_printer_name: Argument to pass with the signal.
  * @arg_printer_info: Argument to pass with the signal.
  * @arg_printer_location: Argument to pass with the signal.
  * @arg_printer_make_and_model: Argument to pass with the signal.
- * @arg_printer_uri: Argument to pass with the signal.
  * @arg_printer_is_accepting_jobs: Argument to pass with the signal.
  * @arg_printer_state: Argument to pass with the signal.
  * @arg_backend_name: Argument to pass with the signal.
@@ -2092,31 +2092,31 @@ print_backend_default_init (PrintBackendIface *iface)
 void
 print_backend_emit_printer_added (
     PrintBackend *object,
+    const gchar *arg_printer_id,
     const gchar *arg_printer_name,
     const gchar *arg_printer_info,
     const gchar *arg_printer_location,
     const gchar *arg_printer_make_and_model,
-    const gchar *arg_printer_uri,
     gboolean arg_printer_is_accepting_jobs,
     const gchar *arg_printer_state,
     const gchar *arg_backend_name)
 {
-  g_signal_emit_by_name (object, "printer-added", arg_printer_name, arg_printer_info, arg_printer_location, arg_printer_make_and_model, arg_printer_uri, arg_printer_is_accepting_jobs, arg_printer_state, arg_backend_name);
+  g_signal_emit_by_name (object, "printer-added", arg_printer_id, arg_printer_name, arg_printer_info, arg_printer_location, arg_printer_make_and_model, arg_printer_is_accepting_jobs, arg_printer_state, arg_backend_name);
 }
 
 /**
  * print_backend_emit_printer_removed:
  * @object: A #PrintBackend.
- * @arg_printer_name: Argument to pass with the signal.
+ * @arg_printer_id: Argument to pass with the signal.
  *
  * Emits the <link linkend="gdbus-signal-org-openprinting-PrintBackend.PrinterRemoved">"PrinterRemoved"</link> D-Bus signal.
  */
 void
 print_backend_emit_printer_removed (
     PrintBackend *object,
-    const gchar *arg_printer_name)
+    const gchar *arg_printer_id)
 {
-  g_signal_emit_by_name (object, "printer-removed", arg_printer_name);
+  g_signal_emit_by_name (object, "printer-removed", arg_printer_id);
 }
 
 /**
@@ -2342,7 +2342,7 @@ print_backend_call_get_default_printer (
 /**
  * print_backend_call_get_default_printer_finish:
  * @proxy: A #PrintBackendProxy.
- * @out_printer_name: (out): Return location for return parameter or %NULL to ignore.
+ * @out_printer_id: (out): Return location for return parameter or %NULL to ignore.
  * @res: The #GAsyncResult obtained from the #GAsyncReadyCallback passed to print_backend_call_get_default_printer().
  * @error: Return location for error or %NULL.
  *
@@ -2353,7 +2353,7 @@ print_backend_call_get_default_printer (
 gboolean
 print_backend_call_get_default_printer_finish (
     PrintBackend *proxy,
-    gchar **out_printer_name,
+    gchar **out_printer_id,
     GAsyncResult *res,
     GError **error)
 {
@@ -2363,7 +2363,7 @@ print_backend_call_get_default_printer_finish (
     goto _out;
   g_variant_get (_ret,
                  "(s)",
-                 out_printer_name);
+                 out_printer_id);
   g_variant_unref (_ret);
 _out:
   return _ret != NULL;
@@ -2372,7 +2372,7 @@ _out:
 /**
  * print_backend_call_get_default_printer_sync:
  * @proxy: A #PrintBackendProxy.
- * @out_printer_name: (out): Return location for return parameter or %NULL to ignore.
+ * @out_printer_id: (out): Return location for return parameter or %NULL to ignore.
  * @cancellable: (allow-none): A #GCancellable or %NULL.
  * @error: Return location for error or %NULL.
  *
@@ -2385,7 +2385,7 @@ _out:
 gboolean
 print_backend_call_get_default_printer_sync (
     PrintBackend *proxy,
-    gchar **out_printer_name,
+    gchar **out_printer_id,
     GCancellable *cancellable,
     GError **error)
 {
@@ -2401,7 +2401,7 @@ print_backend_call_get_default_printer_sync (
     goto _out;
   g_variant_get (_ret,
                  "(s)",
-                 out_printer_name);
+                 out_printer_id);
   g_variant_unref (_ret);
 _out:
   return _ret != NULL;
@@ -4492,7 +4492,7 @@ print_backend_complete_activate_backend (
  * print_backend_complete_get_default_printer:
  * @object: A #PrintBackend.
  * @invocation: (transfer full): A #GDBusMethodInvocation.
- * @printer_name: Parameter to return.
+ * @printer_id: Parameter to return.
  *
  * Helper function used in service implementations to finish handling invocations of the <link linkend="gdbus-method-org-openprinting-PrintBackend.getDefaultPrinter">getDefaultPrinter()</link> D-Bus method. If you instead want to finish handling an invocation by returning an error, use g_dbus_method_invocation_return_error() or similar.
  *
@@ -4502,11 +4502,11 @@ void
 print_backend_complete_get_default_printer (
     PrintBackend *object,
     GDBusMethodInvocation *invocation,
-    const gchar *printer_name)
+    const gchar *printer_id)
 {
   g_dbus_method_invocation_return_value (invocation,
     g_variant_new ("(s)",
-                   printer_name));
+                   printer_id));
 }
 
 /**
@@ -5484,11 +5484,11 @@ print_backend_skeleton_dbus_interface_flush (GDBusInterfaceSkeleton *_skeleton)
 static void
 _print_backend_on_signal_printer_added (
     PrintBackend *object,
+    const gchar *arg_printer_id,
     const gchar *arg_printer_name,
     const gchar *arg_printer_info,
     const gchar *arg_printer_location,
     const gchar *arg_printer_make_and_model,
-    const gchar *arg_printer_uri,
     gboolean arg_printer_is_accepting_jobs,
     const gchar *arg_printer_state,
     const gchar *arg_backend_name)
@@ -5500,11 +5500,11 @@ _print_backend_on_signal_printer_added (
   connections = g_dbus_interface_skeleton_get_connections (G_DBUS_INTERFACE_SKELETON (skeleton));
 
   signal_variant = g_variant_ref_sink (g_variant_new ("(sssssbss)",
+                   arg_printer_id,
                    arg_printer_name,
                    arg_printer_info,
                    arg_printer_location,
                    arg_printer_make_and_model,
-                   arg_printer_uri,
                    arg_printer_is_accepting_jobs,
                    arg_printer_state,
                    arg_backend_name));
@@ -5522,7 +5522,7 @@ _print_backend_on_signal_printer_added (
 static void
 _print_backend_on_signal_printer_removed (
     PrintBackend *object,
-    const gchar *arg_printer_name)
+    const gchar *arg_printer_id)
 {
   PrintBackendSkeleton *skeleton = PRINT_BACKEND_SKELETON (object);
 
@@ -5531,7 +5531,7 @@ _print_backend_on_signal_printer_removed (
   connections = g_dbus_interface_skeleton_get_connections (G_DBUS_INTERFACE_SKELETON (skeleton));
 
   signal_variant = g_variant_ref_sink (g_variant_new ("(s)",
-                   arg_printer_name));
+                   arg_printer_id));
   for (l = connections; l != NULL; l = l->next)
     {
       GDBusConnection *connection = l->data;

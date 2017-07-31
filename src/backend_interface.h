@@ -143,18 +143,18 @@ struct _PrintBackendIface
 
   void (*printer_added) (
     PrintBackend *object,
+    const gchar *arg_printer_id,
     const gchar *arg_printer_name,
     const gchar *arg_printer_info,
     const gchar *arg_printer_location,
     const gchar *arg_printer_make_and_model,
-    const gchar *arg_printer_uri,
     gboolean arg_printer_is_accepting_jobs,
     const gchar *arg_printer_state,
     const gchar *arg_backend_name);
 
   void (*printer_removed) (
     PrintBackend *object,
-    const gchar *arg_printer_name);
+    const gchar *arg_printer_id);
 
 };
 
@@ -177,7 +177,7 @@ void print_backend_complete_activate_backend (
 void print_backend_complete_get_default_printer (
     PrintBackend *object,
     GDBusMethodInvocation *invocation,
-    const gchar *printer_name);
+    const gchar *printer_id);
 
 void print_backend_complete_get_printer_state (
     PrintBackend *object,
@@ -285,18 +285,18 @@ void print_backend_complete_get_quality (
 /* D-Bus signal emissions functions: */
 void print_backend_emit_printer_added (
     PrintBackend *object,
+    const gchar *arg_printer_id,
     const gchar *arg_printer_name,
     const gchar *arg_printer_info,
     const gchar *arg_printer_location,
     const gchar *arg_printer_make_and_model,
-    const gchar *arg_printer_uri,
     gboolean arg_printer_is_accepting_jobs,
     const gchar *arg_printer_state,
     const gchar *arg_backend_name);
 
 void print_backend_emit_printer_removed (
     PrintBackend *object,
-    const gchar *arg_printer_name);
+    const gchar *arg_printer_id);
 
 
 
@@ -343,13 +343,13 @@ void print_backend_call_get_default_printer (
 
 gboolean print_backend_call_get_default_printer_finish (
     PrintBackend *proxy,
-    gchar **out_printer_name,
+    gchar **out_printer_id,
     GAsyncResult *res,
     GError **error);
 
 gboolean print_backend_call_get_default_printer_sync (
     PrintBackend *proxy,
-    gchar **out_printer_name,
+    gchar **out_printer_id,
     GCancellable *cancellable,
     GError **error);
 
