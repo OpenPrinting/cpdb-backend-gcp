@@ -26,38 +26,66 @@ on_name_acquired (GDBusConnection *connection,
                   const gchar *name,
                   gpointer user_data);
 
-static gboolean
-on_handle_get_printers (PrintBackend *skeleton,
-                        GDBusMethodInvocation *invocation,
-                        const gchar *access_token,
-                        const gchar *connection_status,
-                        gpointer user_data);
+// static gboolean
+// on_handle_get_printers (PrintBackend *skeleton,
+//                         GDBusMethodInvocation *invocation,
+//                         const gchar *access_token,
+//                         const gchar *connection_status,
+//                         gpointer user_data);
 
 static gboolean
-on_handle_get_printer_options (PrintBackend *skeleton,
+on_handle_get_all_options (PrintBackend *skeleton,
                                GDBusMethodInvocation *invocation,
-                               const gchar *uid,
-                               const gchar *access_token,
+                               const gchar *printer_id,
+                               gpointer user_data);
+
+// static gboolean
+// on_handle_submit_print_job (PrintBackend *skeleton,
+//                             GDBusMethodInvocation *invocation,
+//                             const gchar *uid,
+//                             const gchar *access_token,
+//                             const gchar *title,
+//                             const gchar *ticket,
+//                             gpointer user_data);
+
+static gboolean
+on_handle_get_all_jobs (PrintBackend *skeleton,
+                        GDBusMethodInvocation *invocation,
+                        gboolean active_only,
+                        gpointer user_data);
+
+
+static gboolean
+on_handle_get_active_jobs_count (PrintBackend *skeleton,
+                                 GDBusMethodInvocation *invocation,
+                                 const gchar *printer_id,
+                                 gpointer user_data);
+
+
+static gboolean
+on_handle_get_default_media (PrintBackend *skeleton,
+                             GDBusMethodInvocation *invocation,
+                             const gchar *printer_id,
+                             gpointer user_data);
+
+static gboolean
+on_handle_get_supported_media (PrintBackend *skeleton,
+                               GDBusMethodInvocation *invocation,
+                               const gchar *printer_id,
                                gpointer user_data);
 
 static gboolean
-on_handle_submit_print_job (PrintBackend *skeleton,
-                            GDBusMethodInvocation *invocation,
-                            const gchar *uid,
-                            const gchar *access_token,
-                            const gchar *title,
-                            const gchar *ticket,
-                            gpointer user_data);
+on_handle_get_default_resolution (PrintBackend *skeleton,
+                                  GDBusMethodInvocation *invocation,
+                                  const gchar *printer_id,
+                                  gpointer user_data);
+
 
 static gboolean
-on_handle_get_print_jobs   (PrintBackend *skeleton,
-                            GDBusMethodInvocation *invocation,
-                            const gchar *access_token,
-                            const gchar *uid,
-                            const gchar *owner,
-                            const gchar *status,
-                            const gchar *sortorder,
-                            gpointer user_data);
+on_handle_get_supported_resolution (PrintBackend *skeleton,
+                                    GDBusMethodInvocation *invocation,
+                                    const gchar *printer_id,
+                                    gpointer user_data);
 
 void connect_to_signals (PrintBackend *skeleton);
 

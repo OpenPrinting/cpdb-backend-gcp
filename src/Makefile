@@ -11,14 +11,17 @@ genback:
 %.o: %.c
 	gcc -g -o $@ $^ -c $(FLAGS)
 
-server: server.o gcp_server.o backend_interface.o utils.o gcp.o
+server: server.o gcp_server.o backend_interface.o common_helper.o gcp.o
 	gcc -g -o $@ $^ $(FLAGS)
 
-client: client.o backend_interface.o utils.o
+client: client.o backend_interface.o common_helper.o
 	gcc -g -o $@ $^ $(FLAGS)
 
-test: test.o utils.o gcp.o
+test: test.o common_helper.o gcp.o
 	gcc -g -o $@ $^ $(FLAGS)
+
+install:
+	./install.sh
 
 clean_gen:
 	rm -f backend_interface.*

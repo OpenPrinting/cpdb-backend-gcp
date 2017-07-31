@@ -1,5 +1,5 @@
-#ifndef UTILS_H
-#define UTILS_H
+#ifndef COMMON_HELPER_H
+#define COMMON_HELPER_H
 
 #define GOA_API_IS_SUBJECT_TO_CHANGE
 
@@ -26,18 +26,20 @@ typedef struct vendor_capability_option{
 } vendor_capability_option;
 
 typedef struct vendor_capability{
-  gchar *id;
   gchar *display_name;
-  gchar *type;
+  gchar *default_value;
+  gint num_supported;
   GList *options;
 } vendor_capability;
 
 typedef struct print_job{
   gchar *id;
   gchar *title;
-  gchar *printerid;
   gchar *printerName;
+  gchar *user;
   gchar *status;
+  gchar *submitted_at;
+  int size;
 } print_job;
 
 typedef struct printer{

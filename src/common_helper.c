@@ -1,4 +1,4 @@
-#include "utils.h"
+#include "common_helper.h"
 
 gboolean make_api_request (RestProxy   *proxy,
                          RestProxyCall **call,
@@ -185,23 +185,25 @@ GList *get_vendor_capability_options (JsonArray *jarray)
     g_assert (json_object_has_member (jobject, "type") == TRUE);
     g_assert (json_object_has_member (jobject, "select_cap") == TRUE);
 
-    const gchar *id = json_object_get_string_member (jobject, "id");
+    // const gchar *id = json_object_get_string_member (jobject, "id");
     const gchar *display_name = json_object_get_string_member (jobject, "display_name");
-    const gchar *type = json_object_get_string_member (jobject, "type");
+    // const gchar *type = json_object_get_string_member (jobject, "type");
     JsonNode *select_cap_node = json_object_get_member (jobject, "select_cap");
     JsonObject *select_cap_obj = json_node_get_object (select_cap_node);
     JsonArray *options = get_array_from_json_object (select_cap_obj, "option");
 
     vendor_capability *capabilities = g_malloc (sizeof (vendor_capability));
-    capabilities->id = g_strdup (id);
+    // capabilities->id = g_strdup (id);
     capabilities->display_name = g_strdup (display_name);
-    capabilities->type = g_strdup (type);
+    capabilities->num_supported = 0;
+    // capabilities->type = g_strdup (type);
     capabilities->options = NULL;
 
     GList *option_list = json_array_get_elements (options);
     GList *values = NULL;
     while (option_list != NULL)
     {
+      capabilities->num_supported++;
       JsonObject *option_obj = json_node_get_object (option_list->data);
       g_assert (option_obj != NULL);
       g_assert (json_object_has_member (option_obj, "display_name") == TRUE);
@@ -217,6 +219,10 @@ GList *get_vendor_capability_options (JsonArray *jarray)
       vc_option->value = g_strdup (value);
 
       capabilities->options = g_list_append (capabilities->options, (gpointer)vc_option);
+
+      if(option_is_default)
+        capabilities->default_value = g_strdup(option_display_name);
+
       option_list = option_list->next;
     }
 
@@ -236,23 +242,32 @@ GList *get_print_jobs_list (JsonArray *jarray)
     g_assert (job_obj != NULL);
     g_assert (json_object_has_member (job_obj, "id") == TRUE);
     g_assert (json_object_has_member (job_obj, "title") == TRUE);
-    g_assert (json_object_has_member (job_obj, "printerid") == TRUE);
     g_assert (json_object_has_member (job_obj, "printerName") == TRUE);
+    g_assert (json_object_has_member (job_obj, "ownerId") == TRUE);
     g_assert (json_object_has_member (job_obj, "status") == TRUE);
+    g_assert (json_object_has_member (job_obj, "createTime") == TRUE);
+    g_assert (json_object_has_member (job_obj, "numberOfPages") == TRUE);
+
 
     const gchar *id = json_object_get_string_member (job_obj, "id");
     const gchar *title = json_object_get_string_member (job_obj, "title");
-    const gchar *printerid = json_object_get_string_member (job_obj, "printerid");
     const gchar *printerName = json_object_get_string_member (job_obj, "printerName");
+    const gchar *ownerId = json_object_get_string_member (job_obj, "ownerId");
     const gchar *status = json_object_get_string_member (job_obj, "status");
+    const gchar *createTime = json_object_get_string_member (job_obj, "createTime");
+    gint numberOfPages = json_object_get_int_member (job_obj, "numberOfPages");
+
 
     print_job *print_job_struct = g_malloc (sizeof (print_job));
 
     print_job_struct->id = g_strdup (id);
     print_job_struct->title = g_strdup (title);
-    print_job_struct->printerid = g_strdup (printerid);
     print_job_struct->printerName = g_strdup (printerName);
+    print_job_struct->user = g_strdup (ownerId);
     print_job_struct->status = g_strdup (status);
+    print_job_struct->submitted_at = g_strdup (createTime);
+    print_job_struct->size = numberOfPages;
+
 
     print_jobs_list = g_list_append (print_jobs_list, (gpointer)print_job_struct);
 
