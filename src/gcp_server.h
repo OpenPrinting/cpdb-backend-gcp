@@ -93,6 +93,12 @@ on_handle_get_printer_state (PrintBackend *skeleton,
                              const gchar *printer_id,
                              gpointer user_data);
 
+static gboolean
+on_handle_is_accepting_jobs (PrintBackend *skeleton,
+                             GDBusMethodInvocation *invocation,
+                             const gchar *printer_id,
+                             gpointer user_data);
+
 void connect_to_signals (PrintBackend *skeleton);
 
 

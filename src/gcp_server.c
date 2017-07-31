@@ -94,6 +94,11 @@ connect_to_signals (PrintBackend *skeleton)
                     "handle_get_printer_state",
                     G_CALLBACK (on_handle_get_printer_state),
                     NULL);
+
+  g_signal_connect (skeleton,
+                    "handle_is_accepting_jobs",
+                    G_CALLBACK (on_handle_is_accepting_jobs),
+                    NULL);
 }
 
 // static gboolean
@@ -521,6 +526,37 @@ on_handle_get_printer_state (PrintBackend *skeleton,
   print_backend_complete_get_printer_state (skeleton,
                                             invocation,
                                             printer_state);
+
+  g_object_unref (gcp);
+  return TRUE;
+}
+
+static gboolean
+on_handle_is_accepting_jobs (PrintBackend *skeleton,
+                             GDBusMethodInvocation *invocation,
+                             const gchar *printer_id,
+                             gpointer user_data)
+{
+  g_print ("on_handle_is_accepting_jobs() called\n");
+  GCPObject *gcp = gcp_object_new ();
+
+  GError *error = NULL;
+  gchar *access_token = g_malloc (150);
+  gint expires_in;
+  gboolean res = get_access_token (&access_token, &expires_in, &error);
+  g_assert (res == TRUE);
+  gboolean is_accepting_jobs = FALSE;
+
+  gchar *printer_state = gcp_object_get_printer_state (gcp,
+                                                       access_token,
+                                                       printer_id);
+  if(g_strcmp0 (printer_state, "ONLINE") == 0)
+    is_accepting_jobs = TRUE;
+
+
+  print_backend_complete_is_accepting_jobs (skeleton,
+                                            invocation,
+                                            is_accepting_jobs);
 
   g_object_unref (gcp);
   return TRUE;

@@ -54,6 +54,15 @@ main ()
   g_print ("%s => %s\n\n", printer_id, printer_status);
 
 
+  g_print ("Enter id of printer to check if printer is accepting jobs:\n");
+  scanf ("%s", printer_id);
+  error = NULL;
+  gboolean is_accepting_jobs;
+  print_backend_call_is_accepting_jobs_sync (proxy, printer_id, &is_accepting_jobs, NULL, &error);
+  g_print ("*******Printer Status*******\n");
+  g_print ("%s => %d\n\n", printer_id, is_accepting_jobs);
+
+
   g_print ("Enter id of printer to get printer options:\n");
   scanf ("%s", printer_id);
 
