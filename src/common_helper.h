@@ -80,6 +80,8 @@ GList *get_print_jobs_list (JsonArray *jarray);
 
 gchar *get_printer_state_from_printers_array (JsonArray *jarray, const gchar *uid);
 
+gboolean get_print_job_cancellation_status (JsonObject *jobject);
+
 void connect_to_dbus (GDBusConnection *connection,
                       PrintBackend *skeleton,
                       gchar *obj_path);

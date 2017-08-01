@@ -33,6 +33,11 @@ struct _PrintBackendIface
     PrintBackend *object,
     GDBusMethodInvocation *invocation);
 
+  gboolean (*handle_cancel_job) (
+    PrintBackend *object,
+    GDBusMethodInvocation *invocation,
+    const gchar *arg_job_id);
+
   gboolean (*handle_get_active_jobs_count) (
     PrintBackend *object,
     GDBusMethodInvocation *invocation,
@@ -52,76 +57,14 @@ struct _PrintBackendIface
     PrintBackend *object,
     GDBusMethodInvocation *invocation);
 
-  gboolean (*handle_get_default_color) (
-    PrintBackend *object,
-    GDBusMethodInvocation *invocation,
-    const gchar *arg_printer_name);
-
-  gboolean (*handle_get_default_media) (
-    PrintBackend *object,
-    GDBusMethodInvocation *invocation,
-    const gchar *arg_printer_id);
-
-  gboolean (*handle_get_default_orientation) (
-    PrintBackend *object,
-    GDBusMethodInvocation *invocation,
-    const gchar *arg_printer_name);
-
   gboolean (*handle_get_default_printer) (
     PrintBackend *object,
     GDBusMethodInvocation *invocation);
-
-  gboolean (*handle_get_default_resolution) (
-    PrintBackend *object,
-    GDBusMethodInvocation *invocation,
-    const gchar *arg_printer_id);
-
-  gboolean (*handle_get_default_value) (
-    PrintBackend *object,
-    GDBusMethodInvocation *invocation,
-    const gchar *arg_printer_name,
-    const gchar *arg_option_name);
-
-  gboolean (*handle_get_page_range) (
-    PrintBackend *object,
-    GDBusMethodInvocation *invocation,
-    const gchar *arg_printer_name);
 
   gboolean (*handle_get_printer_state) (
     PrintBackend *object,
     GDBusMethodInvocation *invocation,
     const gchar *arg_printer_id);
-
-  gboolean (*handle_get_quality) (
-    PrintBackend *object,
-    GDBusMethodInvocation *invocation,
-    const gchar *arg_printer_name);
-
-  gboolean (*handle_get_supported_color) (
-    PrintBackend *object,
-    GDBusMethodInvocation *invocation,
-    const gchar *arg_printer_name);
-
-  gboolean (*handle_get_supported_media) (
-    PrintBackend *object,
-    GDBusMethodInvocation *invocation,
-    const gchar *arg_printer_id);
-
-  gboolean (*handle_get_supported_orientation) (
-    PrintBackend *object,
-    GDBusMethodInvocation *invocation,
-    const gchar *arg_printer_name);
-
-  gboolean (*handle_get_supported_resolution) (
-    PrintBackend *object,
-    GDBusMethodInvocation *invocation,
-    const gchar *arg_printer_id);
-
-  gboolean (*handle_get_supported_values_raw_string) (
-    PrintBackend *object,
-    GDBusMethodInvocation *invocation,
-    const gchar *arg_printer_name,
-    const gchar *arg_option_name);
 
   gboolean (*handle_is_accepting_jobs) (
     PrintBackend *object,
@@ -131,12 +74,12 @@ struct _PrintBackendIface
   gboolean (*handle_ping) (
     PrintBackend *object,
     GDBusMethodInvocation *invocation,
-    const gchar *arg_printer_name);
+    const gchar *arg_printer_id);
 
   gboolean (*handle_print_file) (
     PrintBackend *object,
     GDBusMethodInvocation *invocation,
-    const gchar *arg_printer_name,
+    const gchar *arg_printer_id,
     const gchar *arg_file_path_name,
     gint arg_num_settings,
     GVariant *arg_settings);
@@ -206,79 +149,19 @@ void print_backend_complete_get_all_jobs (
     gint num_jobs,
     GVariant *jobs);
 
+void print_backend_complete_cancel_job (
+    PrintBackend *object,
+    GDBusMethodInvocation *invocation,
+    gboolean status);
+
 void print_backend_complete_print_file (
     PrintBackend *object,
     GDBusMethodInvocation *invocation,
     gint jobid);
 
-void print_backend_complete_get_default_media (
-    PrintBackend *object,
-    GDBusMethodInvocation *invocation,
-    const gchar *media_name);
-
-void print_backend_complete_get_supported_media (
-    PrintBackend *object,
-    GDBusMethodInvocation *invocation,
-    gint num_values,
-    GVariant *values);
-
-void print_backend_complete_get_default_orientation (
-    PrintBackend *object,
-    GDBusMethodInvocation *invocation,
-    const gchar *orientation);
-
-void print_backend_complete_get_supported_orientation (
-    PrintBackend *object,
-    GDBusMethodInvocation *invocation,
-    gint num_values,
-    GVariant *values);
-
-void print_backend_complete_get_default_resolution (
-    PrintBackend *object,
-    GDBusMethodInvocation *invocation,
-    const gchar *resolution);
-
-void print_backend_complete_get_supported_resolution (
-    PrintBackend *object,
-    GDBusMethodInvocation *invocation,
-    gint num_values,
-    GVariant *values);
-
-void print_backend_complete_get_default_color (
-    PrintBackend *object,
-    GDBusMethodInvocation *invocation,
-    const gchar *color_mode);
-
-void print_backend_complete_get_supported_color (
-    PrintBackend *object,
-    GDBusMethodInvocation *invocation,
-    gint num_values,
-    GVariant *values);
-
 void print_backend_complete_ping (
     PrintBackend *object,
     GDBusMethodInvocation *invocation);
-
-void print_backend_complete_get_default_value (
-    PrintBackend *object,
-    GDBusMethodInvocation *invocation,
-    const gchar *option_value);
-
-void print_backend_complete_get_supported_values_raw_string (
-    PrintBackend *object,
-    GDBusMethodInvocation *invocation,
-    gint num_values,
-    GVariant *option_values);
-
-void print_backend_complete_get_page_range (
-    PrintBackend *object,
-    GDBusMethodInvocation *invocation,
-    GVariant *ranges);
-
-void print_backend_complete_get_quality (
-    PrintBackend *object,
-    GDBusMethodInvocation *invocation,
-    const gchar *quality);
 
 
 
@@ -457,9 +340,29 @@ gboolean print_backend_call_get_all_jobs_sync (
     GCancellable *cancellable,
     GError **error);
 
+void print_backend_call_cancel_job (
+    PrintBackend *proxy,
+    const gchar *arg_job_id,
+    GCancellable *cancellable,
+    GAsyncReadyCallback callback,
+    gpointer user_data);
+
+gboolean print_backend_call_cancel_job_finish (
+    PrintBackend *proxy,
+    gboolean *out_status,
+    GAsyncResult *res,
+    GError **error);
+
+gboolean print_backend_call_cancel_job_sync (
+    PrintBackend *proxy,
+    const gchar *arg_job_id,
+    gboolean *out_status,
+    GCancellable *cancellable,
+    GError **error);
+
 void print_backend_call_print_file (
     PrintBackend *proxy,
-    const gchar *arg_printer_name,
+    const gchar *arg_printer_id,
     const gchar *arg_file_path_name,
     gint arg_num_settings,
     GVariant *arg_settings,
@@ -475,7 +378,7 @@ gboolean print_backend_call_print_file_finish (
 
 gboolean print_backend_call_print_file_sync (
     PrintBackend *proxy,
-    const gchar *arg_printer_name,
+    const gchar *arg_printer_id,
     const gchar *arg_file_path_name,
     gint arg_num_settings,
     GVariant *arg_settings,
@@ -483,177 +386,9 @@ gboolean print_backend_call_print_file_sync (
     GCancellable *cancellable,
     GError **error);
 
-void print_backend_call_get_default_media (
-    PrintBackend *proxy,
-    const gchar *arg_printer_id,
-    GCancellable *cancellable,
-    GAsyncReadyCallback callback,
-    gpointer user_data);
-
-gboolean print_backend_call_get_default_media_finish (
-    PrintBackend *proxy,
-    gchar **out_media_name,
-    GAsyncResult *res,
-    GError **error);
-
-gboolean print_backend_call_get_default_media_sync (
-    PrintBackend *proxy,
-    const gchar *arg_printer_id,
-    gchar **out_media_name,
-    GCancellable *cancellable,
-    GError **error);
-
-void print_backend_call_get_supported_media (
-    PrintBackend *proxy,
-    const gchar *arg_printer_id,
-    GCancellable *cancellable,
-    GAsyncReadyCallback callback,
-    gpointer user_data);
-
-gboolean print_backend_call_get_supported_media_finish (
-    PrintBackend *proxy,
-    gint *out_num_values,
-    GVariant **out_values,
-    GAsyncResult *res,
-    GError **error);
-
-gboolean print_backend_call_get_supported_media_sync (
-    PrintBackend *proxy,
-    const gchar *arg_printer_id,
-    gint *out_num_values,
-    GVariant **out_values,
-    GCancellable *cancellable,
-    GError **error);
-
-void print_backend_call_get_default_orientation (
-    PrintBackend *proxy,
-    const gchar *arg_printer_name,
-    GCancellable *cancellable,
-    GAsyncReadyCallback callback,
-    gpointer user_data);
-
-gboolean print_backend_call_get_default_orientation_finish (
-    PrintBackend *proxy,
-    gchar **out_orientation,
-    GAsyncResult *res,
-    GError **error);
-
-gboolean print_backend_call_get_default_orientation_sync (
-    PrintBackend *proxy,
-    const gchar *arg_printer_name,
-    gchar **out_orientation,
-    GCancellable *cancellable,
-    GError **error);
-
-void print_backend_call_get_supported_orientation (
-    PrintBackend *proxy,
-    const gchar *arg_printer_name,
-    GCancellable *cancellable,
-    GAsyncReadyCallback callback,
-    gpointer user_data);
-
-gboolean print_backend_call_get_supported_orientation_finish (
-    PrintBackend *proxy,
-    gint *out_num_values,
-    GVariant **out_values,
-    GAsyncResult *res,
-    GError **error);
-
-gboolean print_backend_call_get_supported_orientation_sync (
-    PrintBackend *proxy,
-    const gchar *arg_printer_name,
-    gint *out_num_values,
-    GVariant **out_values,
-    GCancellable *cancellable,
-    GError **error);
-
-void print_backend_call_get_default_resolution (
-    PrintBackend *proxy,
-    const gchar *arg_printer_id,
-    GCancellable *cancellable,
-    GAsyncReadyCallback callback,
-    gpointer user_data);
-
-gboolean print_backend_call_get_default_resolution_finish (
-    PrintBackend *proxy,
-    gchar **out_resolution,
-    GAsyncResult *res,
-    GError **error);
-
-gboolean print_backend_call_get_default_resolution_sync (
-    PrintBackend *proxy,
-    const gchar *arg_printer_id,
-    gchar **out_resolution,
-    GCancellable *cancellable,
-    GError **error);
-
-void print_backend_call_get_supported_resolution (
-    PrintBackend *proxy,
-    const gchar *arg_printer_id,
-    GCancellable *cancellable,
-    GAsyncReadyCallback callback,
-    gpointer user_data);
-
-gboolean print_backend_call_get_supported_resolution_finish (
-    PrintBackend *proxy,
-    gint *out_num_values,
-    GVariant **out_values,
-    GAsyncResult *res,
-    GError **error);
-
-gboolean print_backend_call_get_supported_resolution_sync (
-    PrintBackend *proxy,
-    const gchar *arg_printer_id,
-    gint *out_num_values,
-    GVariant **out_values,
-    GCancellable *cancellable,
-    GError **error);
-
-void print_backend_call_get_default_color (
-    PrintBackend *proxy,
-    const gchar *arg_printer_name,
-    GCancellable *cancellable,
-    GAsyncReadyCallback callback,
-    gpointer user_data);
-
-gboolean print_backend_call_get_default_color_finish (
-    PrintBackend *proxy,
-    gchar **out_color_mode,
-    GAsyncResult *res,
-    GError **error);
-
-gboolean print_backend_call_get_default_color_sync (
-    PrintBackend *proxy,
-    const gchar *arg_printer_name,
-    gchar **out_color_mode,
-    GCancellable *cancellable,
-    GError **error);
-
-void print_backend_call_get_supported_color (
-    PrintBackend *proxy,
-    const gchar *arg_printer_name,
-    GCancellable *cancellable,
-    GAsyncReadyCallback callback,
-    gpointer user_data);
-
-gboolean print_backend_call_get_supported_color_finish (
-    PrintBackend *proxy,
-    gint *out_num_values,
-    GVariant **out_values,
-    GAsyncResult *res,
-    GError **error);
-
-gboolean print_backend_call_get_supported_color_sync (
-    PrintBackend *proxy,
-    const gchar *arg_printer_name,
-    gint *out_num_values,
-    GVariant **out_values,
-    GCancellable *cancellable,
-    GError **error);
-
 void print_backend_call_ping (
     PrintBackend *proxy,
-    const gchar *arg_printer_name,
+    const gchar *arg_printer_id,
     GCancellable *cancellable,
     GAsyncReadyCallback callback,
     gpointer user_data);
@@ -665,93 +400,7 @@ gboolean print_backend_call_ping_finish (
 
 gboolean print_backend_call_ping_sync (
     PrintBackend *proxy,
-    const gchar *arg_printer_name,
-    GCancellable *cancellable,
-    GError **error);
-
-void print_backend_call_get_default_value (
-    PrintBackend *proxy,
-    const gchar *arg_printer_name,
-    const gchar *arg_option_name,
-    GCancellable *cancellable,
-    GAsyncReadyCallback callback,
-    gpointer user_data);
-
-gboolean print_backend_call_get_default_value_finish (
-    PrintBackend *proxy,
-    gchar **out_option_value,
-    GAsyncResult *res,
-    GError **error);
-
-gboolean print_backend_call_get_default_value_sync (
-    PrintBackend *proxy,
-    const gchar *arg_printer_name,
-    const gchar *arg_option_name,
-    gchar **out_option_value,
-    GCancellable *cancellable,
-    GError **error);
-
-void print_backend_call_get_supported_values_raw_string (
-    PrintBackend *proxy,
-    const gchar *arg_printer_name,
-    const gchar *arg_option_name,
-    GCancellable *cancellable,
-    GAsyncReadyCallback callback,
-    gpointer user_data);
-
-gboolean print_backend_call_get_supported_values_raw_string_finish (
-    PrintBackend *proxy,
-    gint *out_num_values,
-    GVariant **out_option_values,
-    GAsyncResult *res,
-    GError **error);
-
-gboolean print_backend_call_get_supported_values_raw_string_sync (
-    PrintBackend *proxy,
-    const gchar *arg_printer_name,
-    const gchar *arg_option_name,
-    gint *out_num_values,
-    GVariant **out_option_values,
-    GCancellable *cancellable,
-    GError **error);
-
-void print_backend_call_get_page_range (
-    PrintBackend *proxy,
-    const gchar *arg_printer_name,
-    GCancellable *cancellable,
-    GAsyncReadyCallback callback,
-    gpointer user_data);
-
-gboolean print_backend_call_get_page_range_finish (
-    PrintBackend *proxy,
-    GVariant **out_ranges,
-    GAsyncResult *res,
-    GError **error);
-
-gboolean print_backend_call_get_page_range_sync (
-    PrintBackend *proxy,
-    const gchar *arg_printer_name,
-    GVariant **out_ranges,
-    GCancellable *cancellable,
-    GError **error);
-
-void print_backend_call_get_quality (
-    PrintBackend *proxy,
-    const gchar *arg_printer_name,
-    GCancellable *cancellable,
-    GAsyncReadyCallback callback,
-    gpointer user_data);
-
-gboolean print_backend_call_get_quality_finish (
-    PrintBackend *proxy,
-    gchar **out_quality,
-    GAsyncResult *res,
-    GError **error);
-
-gboolean print_backend_call_get_quality_sync (
-    PrintBackend *proxy,
-    const gchar *arg_printer_name,
-    gchar **out_quality,
+    const gchar *arg_printer_id,
     GCancellable *cancellable,
     GError **error);
 

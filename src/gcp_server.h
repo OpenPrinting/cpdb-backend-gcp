@@ -61,32 +61,6 @@ on_handle_get_active_jobs_count (PrintBackend *skeleton,
                                  const gchar *printer_id,
                                  gpointer user_data);
 
-
-static gboolean
-on_handle_get_default_media (PrintBackend *skeleton,
-                             GDBusMethodInvocation *invocation,
-                             const gchar *printer_id,
-                             gpointer user_data);
-
-static gboolean
-on_handle_get_supported_media (PrintBackend *skeleton,
-                               GDBusMethodInvocation *invocation,
-                               const gchar *printer_id,
-                               gpointer user_data);
-
-static gboolean
-on_handle_get_default_resolution (PrintBackend *skeleton,
-                                  GDBusMethodInvocation *invocation,
-                                  const gchar *printer_id,
-                                  gpointer user_data);
-
-
-static gboolean
-on_handle_get_supported_resolution (PrintBackend *skeleton,
-                                    GDBusMethodInvocation *invocation,
-                                    const gchar *printer_id,
-                                    gpointer user_data);
-
 static gboolean
 on_handle_get_printer_state (PrintBackend *skeleton,
                              GDBusMethodInvocation *invocation,
@@ -98,6 +72,12 @@ on_handle_is_accepting_jobs (PrintBackend *skeleton,
                              GDBusMethodInvocation *invocation,
                              const gchar *printer_id,
                              gpointer user_data);
+
+static gboolean
+on_handle_cancel_job (PrintBackend *skeleton,
+                     GDBusMethodInvocation *invocation,
+                     const gchar *job_id,
+                     gpointer user_data);
 
 void connect_to_signals (PrintBackend *skeleton);
 

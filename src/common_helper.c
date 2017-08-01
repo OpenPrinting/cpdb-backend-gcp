@@ -310,3 +310,10 @@ gchar *get_printer_state_from_printers_array (JsonArray *jarray, const gchar *ui
   }
   return printer_state;
 }
+
+gboolean get_print_job_cancellation_status (JsonObject *jobject)
+{
+  g_assert (json_object_has_member (jobject, "success") == TRUE);
+  gboolean success_status = json_object_get_boolean_member (jobject, "success");
+  return success_status;
+}

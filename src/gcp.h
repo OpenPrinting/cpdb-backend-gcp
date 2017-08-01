@@ -34,6 +34,10 @@ struct _GCPObjectClass
                                    const gchar *,
                                    const gchar *,
                                    const gchar *);
+
+  const gchar * (*cancel_print_job) (GCPObject *,
+                                     const gchar *,
+                                     const gchar *);
 };
 
 GCPObject *
@@ -84,6 +88,11 @@ gchar *
 gcp_object_get_printer_state (GCPObject *self,
                               const gchar *access_token,
                               const gchar *uid);
+
+gboolean
+gcp_object_delete_print_job (GCPObject *self,
+                             const gchar *access_token,
+                             const gchar *job_id);
 
 G_END_DECLS
 

@@ -71,26 +71,6 @@ connect_to_signals (PrintBackend *skeleton)
                     NULL);
 
   g_signal_connect (skeleton,
-                    "handle_get_default_media",
-                    G_CALLBACK (on_handle_get_default_media),
-                    NULL);
-
-  g_signal_connect (skeleton,
-                    "handle_get_supported_media",
-                    G_CALLBACK (on_handle_get_supported_media),
-                    NULL);
-
-  g_signal_connect (skeleton,
-                    "handle_get_default_resolution",
-                    G_CALLBACK (on_handle_get_default_resolution),
-                    NULL);
-
-  g_signal_connect (skeleton,
-                    "handle_get_supported_resolution",
-                    G_CALLBACK (on_handle_get_supported_resolution),
-                    NULL);
-
-  g_signal_connect (skeleton,
                     "handle_get_printer_state",
                     G_CALLBACK (on_handle_get_printer_state),
                     NULL);
@@ -98,6 +78,11 @@ connect_to_signals (PrintBackend *skeleton)
   g_signal_connect (skeleton,
                     "handle_is_accepting_jobs",
                     G_CALLBACK (on_handle_is_accepting_jobs),
+                    NULL);
+
+  g_signal_connect (skeleton,
+                    "handle_cancel_job",
+                    G_CALLBACK (on_handle_cancel_job),
                     NULL);
 }
 
@@ -320,191 +305,6 @@ on_handle_get_active_jobs_count (PrintBackend *skeleton,
 }
 
 static gboolean
-on_handle_get_default_media (PrintBackend *skeleton,
-                             GDBusMethodInvocation *invocation,
-                             const gchar *printer_id,
-                             gpointer user_data)
-{
-  g_print ("on_handle_get_default_media() called\n");
-  GCPObject *gcp = gcp_object_new ();
-
-  GError *error = NULL;
-  gchar *access_token = g_malloc (150);
-  gint expires_in;
-  gboolean res = get_access_token (&access_token, &expires_in, &error);
-  g_assert (res == TRUE);
-
-  GList *media_size_list = gcp_object_get_media_size_options (gcp,
-                                                              printer_id,
-                                                              access_token);
-  gchar *default_media;
-  while(media_size_list != NULL)
-  {
-   media_size *media = media_size_list->data;
-   if(media->is_default)
-   {
-     default_media = g_strdup(media->custom_display_name);
-     break;
-   }
-   media_size_list = media_size_list->next;
-  }
-
-  print_backend_complete_get_default_media (skeleton,
-                                            invocation,
-                                            default_media);
-
-  g_object_unref (gcp);
-  return TRUE;
-}
-
-static gboolean
-on_handle_get_supported_media (PrintBackend *skeleton,
-                               GDBusMethodInvocation *invocation,
-                               const gchar *printer_id,
-                               gpointer user_data)
-{
-  g_print ("on_handle_get_supported_media() called\n");
-  GCPObject *gcp = gcp_object_new ();
-
-  GError *error = NULL;
-  gchar *access_token = g_malloc (150);
-  gint expires_in;
-  gboolean res = get_access_token (&access_token, &expires_in, &error);
-  g_assert (res == TRUE);
-
-  GList *media_size_list = gcp_object_get_media_size_options (gcp,
-                                                              printer_id,
-                                                              access_token);
-
-  GVariantBuilder *builder;
-  GVariant *supported_media;
-  int num_values = 0;
-  builder = g_variant_builder_new (G_VARIANT_TYPE ("a(s)"));
-  while(media_size_list != NULL)
-  {
-   media_size *media = media_size_list->data;
-
-   GVariant *value = g_variant_new ("(s)", media->custom_display_name);
-
-   g_variant_builder_add (builder, "(s)", value);
-   num_values++;
-   media_size_list = media_size_list->next;
-  }
-  supported_media = g_variant_builder_end (builder);
-
-  print_backend_complete_get_supported_media (skeleton,
-                                              invocation,
-                                              num_values,
-                                              supported_media);
-
-  g_object_unref (gcp);
-  return TRUE;
-}
-
-static gboolean
-on_handle_get_default_resolution (PrintBackend *skeleton,
-                                  GDBusMethodInvocation *invocation,
-                                  const gchar *printer_id,
-                                  gpointer user_data)
-{
-  g_print ("on_handle_get_default_resolution() called\n");
-  GCPObject *gcp = gcp_object_new ();
-
-  GError *error = NULL;
-  gchar *access_token = g_malloc (150);
-  gint expires_in;
-  gboolean res = get_access_token (&access_token, &expires_in, &error);
-  g_assert (res == TRUE);
-
-  GList *vendor_capability_options = gcp_object_get_vendor_capability_options (gcp,
-                                                                               printer_id,
-                                                                               access_token);
-
-  GVariantBuilder *builder;
-
-  gchar *default_resolution;
-  while(vendor_capability_options != NULL)
-  {
-    vendor_capability *vc = vendor_capability_options->data;
-
-    if(g_strcmp0(vc->display_name, "Resolution") == 0)
-    {
-      GList *options = vc->options;
-      while (options != NULL)
-      {
-       vendor_capability_option *vc_option = options->data;
-       if(vc_option->is_default)
-       {
-         default_resolution = g_strdup (vc_option->display_name);
-         break;
-       }
-       options = options->next;
-      }
-      break;
-    }
-    vendor_capability_options = vendor_capability_options->next;
-  }
-
-  print_backend_complete_get_default_resolution (skeleton,
-                                                 invocation,
-                                                 default_resolution);
-
-  g_object_unref (gcp);
-  return TRUE;
-}
-
-static gboolean
-on_handle_get_supported_resolution (PrintBackend *skeleton,
-                                    GDBusMethodInvocation *invocation,
-                                    const gchar *printer_id,
-                                    gpointer user_data)
-{
-  g_print ("on_handle_get_supported_resolution() called\n");
-  GCPObject *gcp = gcp_object_new ();
-
-  GError *error = NULL;
-  gchar *access_token = g_malloc (150);
-  gint expires_in;
-  gboolean res = get_access_token (&access_token, &expires_in, &error);
-  g_assert (res == TRUE);
-
-  GList *vendor_capability_options = gcp_object_get_vendor_capability_options (gcp,
-                                                                               printer_id,
-                                                                               access_token);
-
-  GVariantBuilder *builder;
-  GVariant *supported_resolution_values;
-  builder = g_variant_builder_new (G_VARIANT_TYPE ("a(s)"));
-  int num_values = 0;
-  while(vendor_capability_options != NULL)
-  {
-    vendor_capability *vc = vendor_capability_options->data;
-    if(g_strcmp0(vc->display_name, "Resolution") == 0)
-    {
-      GList *options = vc->options;
-      while (options != NULL)
-      {
-       vendor_capability_option *vc_option = options->data;
-       g_variant_builder_add (builder, "(s)", vc_option->display_name);
-       num_values++;
-       options = options->next;
-      }
-      break;
-    }
-    vendor_capability_options = vendor_capability_options->next;
-  }
-  supported_resolution_values = g_variant_builder_end (builder);
-
-  print_backend_complete_get_supported_resolution (skeleton,
-                                                   invocation,
-                                                   num_values,
-                                                   supported_resolution_values);
-
-  g_object_unref (gcp);
-  return TRUE;
-}
-
-static gboolean
 on_handle_get_printer_state (PrintBackend *skeleton,
                              GDBusMethodInvocation *invocation,
                              const gchar *printer_id,
@@ -557,6 +357,32 @@ on_handle_is_accepting_jobs (PrintBackend *skeleton,
   print_backend_complete_is_accepting_jobs (skeleton,
                                             invocation,
                                             is_accepting_jobs);
+
+  g_object_unref (gcp);
+  return TRUE;
+}
+
+static gboolean
+on_handle_cancel_job (PrintBackend *skeleton,
+                      GDBusMethodInvocation *invocation,
+                      const gchar *job_id,
+                      gpointer user_data)
+{
+  g_print ("on_handle_is_accepting_jobs() called\n");
+  GCPObject *gcp = gcp_object_new ();
+
+  GError *error = NULL;
+  gchar *access_token = g_malloc (150);
+  gint expires_in;
+  gboolean res = get_access_token (&access_token, &expires_in, &error);
+  g_assert (res == TRUE);
+  gboolean is_cancelled = gcp_object_delete_print_job (gcp,
+                                                       access_token,
+                                                       job_id);
+
+  print_backend_complete_is_accepting_jobs (skeleton,
+                                            invocation,
+                                            is_cancelled);
 
   g_object_unref (gcp);
   return TRUE;

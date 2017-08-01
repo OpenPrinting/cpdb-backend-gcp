@@ -27,6 +27,12 @@ gcp_object_real_get_print_jobs (GCPObject *self,
                                 const gchar *owner,
                                 const gchar *status,
                                 const gchar *sortorder);
+
+const gchar *
+gcp_object_real_cancel_print_job (GCPObject *self,
+                                  const gchar *access_token,
+                                  const gchar *job_id);
+
 /*****************************************************************************/
 
 GCPObject *
@@ -49,6 +55,7 @@ gcp_object_class_init (GCPObjectClass *klass)
   klass->get_printer_options = gcp_object_real_get_printer_options;
   klass->submit_print_job = gcp_object_real_submit_print_job;
   klass->get_print_jobs = gcp_object_real_get_print_jobs;
+  klass->cancel_print_job = gcp_object_real_cancel_print_job;
 }
 
 GList *
@@ -300,6 +307,51 @@ gcp_object_real_get_print_jobs (GCPObject *self,
   return printer_jobs;
 }
 
+const gchar *
+gcp_object_real_cancel_print_job (GCPObject *self,
+                                  const gchar *access_token,
+                                  const gchar *job_id)
+{
+  RestProxy *proxy;
+  RestProxyCall *call;
+
+  const gchar *header = "X-CloudPrint-Proxy";
+  const gchar *header_value = "Common Printing Dialog";
+  const gchar *method = "GET";
+  const gchar *function = "deletejob";
+  const gchar *param_access_token = "access_token";
+  const gchar *param_job_id = "jobid";
+
+  gboolean res = FALSE;
+
+  proxy = rest_proxy_new ("https://www.google.com/cloudprint/", FALSE);
+  call = rest_proxy_new_call (proxy);
+  res = make_api_request (proxy,
+                          &call,
+                          method,
+                          function,
+                          header, header_value,
+                          param_access_token, access_token,
+                          param_job_id, job_id,
+                          NULL);
+
+  const gchar *delete_job_status;
+
+  if (res)
+  {
+    delete_job_status = rest_proxy_call_get_payload (call);
+    g_print ("%s\n", delete_job_status);
+  }
+  else
+  {
+    delete_job_status = g_strdup("API request failed!");
+  }
+
+  /* TODO: Error handling in case something goes wrong. */
+
+  return delete_job_status;
+}
+
 gchar *
 gcp_object_get_printer_state (GCPObject *self,
                               const gchar *access_token,
@@ -315,4 +367,20 @@ gcp_object_get_printer_state (GCPObject *self,
   gchar *printer_state = get_printer_state_from_printers_array (jarray, uid);
 
   return printer_state;
+}
+
+gboolean
+gcp_object_delete_print_job (GCPObject *self,
+                             const gchar *access_token,
+                             const gchar *job_id)
+{
+  g_return_val_if_fail (GCP_IS_OBJECT (self), FALSE);
+
+  GCPObjectClass *klass = GCP_OBJECT_GET_CLASS (self);
+  const gchar *is_cancelled = klass->cancel_print_job (self, access_token, job_id);
+
+  JsonObject *jobject = json_data_get_root (is_cancelled);
+  gboolean job_cancel_status = get_print_job_cancellation_status (jobject);
+
+  return job_cancel_status;
 }
