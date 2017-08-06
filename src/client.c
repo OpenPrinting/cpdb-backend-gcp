@@ -1,11 +1,6 @@
 #include "common_helper.h"
 #include <stdio.h>
 
-static void
-callback_get_printers_async(GObject *proxy,
-                            GAsyncResult *res,
-                            gpointer user_data);
-
 int
 main ()
 {

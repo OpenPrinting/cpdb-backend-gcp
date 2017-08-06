@@ -96,41 +96,6 @@ connect_to_signals (PrintBackend *skeleton)
                     NULL);
 }
 
-// static gboolean
-// on_handle_get_printers (PrintBackend *skeleton,
-//                         GDBusMethodInvocation *invocation,
-//                         const gchar *access_token,
-//                         const gchar *connection_status,
-//                         gpointer user_data)
-//
-// {
-//   g_print ("on_handle_get_printers() called\n");
-//   GCPObject *gcp = gcp_object_new ();
-//   GList *printers = gcp_object_get_printers (gcp,
-//                                              access_token,
-//                                              connection_status);
-//
-//   g_assert (printers != NULL);
-//
-//   GVariantBuilder *builder;
-//   GVariant *dict;
-//   builder = g_variant_builder_new (G_VARIANT_TYPE ("a{sv}"));
-//   while(printers != NULL)
-//   {
-//     printer *printer_struct = printers->data;
-//     GVariant *value = g_variant_new ("(s)", printer_struct->name);
-//     g_variant_builder_add (builder, "{sv}", printer_struct->id, value);
-//     printers = printers->next;
-//   }
-//
-//   dict = g_variant_builder_end (builder);
-//   print_backend_complete_get_printers (skeleton,
-//                                        invocation,
-//                                        dict);
-//
-//   g_object_unref (gcp);
-//   return TRUE;
-// }
 
 static gboolean
 on_handle_get_all_options (PrintBackend *skeleton,

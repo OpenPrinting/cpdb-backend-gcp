@@ -43,11 +43,6 @@ struct _GCPObjectClass
 GCPObject *
 gcp_object_new ();
 
-// GHashTable *
-// gcp_object_get_printers (GCPObject *self,
-//                          const gchar *access_token,
-//                          const gchar *connection_status);
-
 GList *
 gcp_object_get_printers (GCPObject *self,
                          const gchar *access_token,
@@ -63,11 +58,6 @@ GList *
 gcp_object_get_vendor_capability_options (GCPObject   *self,
                                           const gchar *uid,
                                           const gchar *access_token);
-
-// GHashTable *
-// gcp_object_get_printer_options (GCPObject   *self,
-//                                 const gchar *uid,
-//                                 const gchar *access_token);
 
 gboolean
 gcp_object_submit_print_job (GCPObject   *self,
@@ -96,4 +86,4 @@ gcp_object_delete_print_job (GCPObject *self,
 
 G_END_DECLS
 
-#endif
+#endif /* GCP_H */

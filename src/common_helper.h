@@ -93,4 +93,4 @@ void connect_to_dbus (GDBusConnection *connection,
                       PrintBackend *skeleton,
                       gchar *obj_path);
 
-#endif /* UTILS_H */
+#endif /* COMMON_HELPER_H */

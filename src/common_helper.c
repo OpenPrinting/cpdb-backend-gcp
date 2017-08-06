@@ -194,18 +194,14 @@ GList *get_vendor_capability_options (JsonArray *jarray)
     g_assert (json_object_has_member (jobject, "type") == TRUE);
     g_assert (json_object_has_member (jobject, "select_cap") == TRUE);
 
-    // const gchar *id = json_object_get_string_member (jobject, "id");
     const gchar *display_name = json_object_get_string_member (jobject, "display_name");
-    // const gchar *type = json_object_get_string_member (jobject, "type");
     JsonNode *select_cap_node = json_object_get_member (jobject, "select_cap");
     JsonObject *select_cap_obj = json_node_get_object (select_cap_node);
     JsonArray *options = get_array_from_json_object (select_cap_obj, "option");
 
     vendor_capability *capabilities = g_malloc (sizeof (vendor_capability));
-    // capabilities->id = g_strdup (id);
     capabilities->display_name = g_strdup (display_name);
     capabilities->num_supported = 0;
-    // capabilities->type = g_strdup (type);
     capabilities->options = NULL;
 
     GList *option_list = json_array_get_elements (options);

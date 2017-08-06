@@ -340,7 +340,6 @@ gcp_object_real_cancel_print_job (GCPObject *self,
   if (res)
   {
     delete_job_status = rest_proxy_call_get_payload (call);
-    // g_print ("%s\n", delete_job_status);
   }
   else
   {

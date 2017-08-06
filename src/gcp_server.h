@@ -31,13 +31,6 @@ on_name_acquired (GDBusConnection *connection,
                   const gchar *name,
                   gpointer user_data);
 
-// static gboolean
-// on_handle_get_printers (PrintBackend *skeleton,
-//                         GDBusMethodInvocation *invocation,
-//                         const gchar *access_token,
-//                         const gchar *connection_status,
-//                         gpointer user_data);
-
 static gboolean
 on_handle_get_all_options (PrintBackend *skeleton,
                                GDBusMethodInvocation *invocation,
@@ -95,4 +88,4 @@ BackendObj *get_new_BackendObj();
 
 G_END_DECLS
 
-#endif
+#endif /* GCP_SERVER_H */
