@@ -794,9 +794,21 @@ static const _ExtendedGDBusArgInfo _print_backend_signal_info_printer_removed_AR
   FALSE
 };
 
+static const _ExtendedGDBusArgInfo _print_backend_signal_info_printer_removed_ARG_backend_name =
+{
+  {
+    -1,
+    (gchar *) "backend_name",
+    (gchar *) "s",
+    NULL
+  },
+  FALSE
+};
+
 static const _ExtendedGDBusArgInfo * const _print_backend_signal_info_printer_removed_ARG_pointers[] =
 {
   &_print_backend_signal_info_printer_removed_ARG_printer_id,
+  &_print_backend_signal_info_printer_removed_ARG_backend_name,
   NULL
 };
 
@@ -1180,6 +1192,7 @@ print_backend_default_init (PrintBackendIface *iface)
    * PrintBackend::printer-removed:
    * @object: A #PrintBackend.
    * @arg_printer_id: Argument.
+   * @arg_backend_name: Argument.
    *
    * On the client-side, this signal is emitted whenever the D-Bus signal <link linkend="gdbus-signal-org-openprinting-PrintBackend.PrinterRemoved">"PrinterRemoved"</link> is received.
    *
@@ -1193,7 +1206,7 @@ print_backend_default_init (PrintBackendIface *iface)
     NULL,
     g_cclosure_marshal_generic,
     G_TYPE_NONE,
-    1, G_TYPE_STRING);
+    2, G_TYPE_STRING, G_TYPE_STRING);
 
 }
 
@@ -1230,15 +1243,17 @@ print_backend_emit_printer_added (
  * print_backend_emit_printer_removed:
  * @object: A #PrintBackend.
  * @arg_printer_id: Argument to pass with the signal.
+ * @arg_backend_name: Argument to pass with the signal.
  *
  * Emits the <link linkend="gdbus-signal-org-openprinting-PrintBackend.PrinterRemoved">"PrinterRemoved"</link> D-Bus signal.
  */
 void
 print_backend_emit_printer_removed (
     PrintBackend *object,
-    const gchar *arg_printer_id)
+    const gchar *arg_printer_id,
+    const gchar *arg_backend_name)
 {
-  g_signal_emit_by_name (object, "printer-removed", arg_printer_id);
+  g_signal_emit_by_name (object, "printer-removed", arg_printer_id, arg_backend_name);
 }
 
 /**
@@ -3212,7 +3227,8 @@ _print_backend_on_signal_printer_added (
 static void
 _print_backend_on_signal_printer_removed (
     PrintBackend *object,
-    const gchar *arg_printer_id)
+    const gchar *arg_printer_id,
+    const gchar *arg_backend_name)
 {
   PrintBackendSkeleton *skeleton = PRINT_BACKEND_SKELETON (object);
 
@@ -3220,8 +3236,9 @@ _print_backend_on_signal_printer_removed (
   GVariant   *signal_variant;
   connections = g_dbus_interface_skeleton_get_connections (G_DBUS_INTERFACE_SKELETON (skeleton));
 
-  signal_variant = g_variant_ref_sink (g_variant_new ("(s)",
-                   arg_printer_id));
+  signal_variant = g_variant_ref_sink (g_variant_new ("(ss)",
+                   arg_printer_id,
+                   arg_backend_name));
   for (l = connections; l != NULL; l = l->next)
     {
       GDBusConnection *connection = l->data;

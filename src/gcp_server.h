@@ -15,6 +15,11 @@ struct _ServerObjectClass
   GObjectClass parent;
 };
 
+typedef struct _BackendObj
+{
+    GDBusConnection *dbus_connection;
+} BackendObj;
+
 ServerObject *
 server_object_new ();
 
@@ -79,8 +84,14 @@ on_handle_cancel_job (PrintBackend *skeleton,
                      const gchar *job_id,
                      gpointer user_data);
 
+static gboolean
+on_handle_activate_backend (PrintBackend *skeleton,
+                            GDBusMethodInvocation *invocation,
+                            gpointer user_data);
+
 void connect_to_signals (PrintBackend *skeleton);
 
+BackendObj *get_new_BackendObj();
 
 G_END_DECLS
 

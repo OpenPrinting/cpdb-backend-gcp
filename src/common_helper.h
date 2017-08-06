@@ -9,6 +9,9 @@
 #include <goa/goa.h>
 #include "backend_interface.h"
 
+#define PRINTER_ADDED_ARGS "(sssssbss)"
+#define PRINTER_ADDED_SIGNAL "PrinterAdded"
+
 typedef struct media_size{
   gint height_microns;
   gint width_microns;
@@ -45,6 +48,9 @@ typedef struct print_job{
 typedef struct printer{
   gchar *id;
   gchar *name;
+  gchar *description;
+  gchar *location;
+  gchar *make_and_model;
 } printer;
 
 gboolean make_api_request (RestProxy     *proxy,
@@ -70,7 +76,8 @@ gboolean get_access_token (gchar **out_access_token,
 
 GList *get_printer_struct_from_json_array (JsonArray *jarray,
                                           const gchar *id,
-                                          const gchar *name);
+                                          const gchar *name,
+                                          const gchar *description);
 
 GList *get_media_size_options (JsonArray *jarray);
 

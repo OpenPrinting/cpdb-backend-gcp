@@ -7,6 +7,8 @@ G_DEFINE_TYPE (ServerObject, server_object, G_TYPE_OBJECT)
 #define BUS_NAME "org.openprinting.Backend.GCP"
 #define OBJECT_PATH "/"
 
+BackendObj *b;
+
 ServerObject *
 server_object_new()
 {
@@ -36,6 +38,8 @@ acquire_session_bus_name ()
                   NULL,                 // name lost handler
                   NULL,                 // user_data
                   NULL);                // user_data_free_func
+
+  g_print("acquire_session_bus_name");
 }
 
 static void
@@ -44,6 +48,7 @@ on_name_acquired (GDBusConnection *connection,
                   gpointer user_data)
 {
   g_print ("name acquired!\n");
+  b->dbus_connection = connection;
   PrintBackend *skeleton;
   skeleton = print_backend_skeleton_new ();
   connect_to_signals (skeleton);
@@ -83,6 +88,11 @@ connect_to_signals (PrintBackend *skeleton)
   g_signal_connect (skeleton,
                     "handle_cancel_job",
                     G_CALLBACK (on_handle_cancel_job),
+                    NULL);
+
+  g_signal_connect (skeleton,
+                    "handle_activate_backend",
+                    G_CALLBACK (on_handle_activate_backend),
                     NULL);
 }
 
@@ -380,10 +390,94 @@ on_handle_cancel_job (PrintBackend *skeleton,
                                                        access_token,
                                                        job_id);
 
-  print_backend_complete_is_accepting_jobs (skeleton,
-                                            invocation,
-                                            is_cancelled);
+  print_backend_complete_cancel_job (skeleton,
+                                     invocation,
+                                     is_cancelled);
 
   g_object_unref (gcp);
   return TRUE;
+}
+
+
+static gboolean
+on_handle_activate_backend (PrintBackend *skeleton,
+                            GDBusMethodInvocation *invocation,
+                            gpointer user_data)
+{
+  g_print ("on_handle_activate_backend() called\n");
+  GCPObject *gcp = gcp_object_new ();
+
+  GError *error = NULL;
+  gchar *access_token = g_malloc (150);
+  gint expires_in;
+  gboolean res = get_access_token (&access_token, &expires_in, &error);
+  g_assert (res == TRUE);
+
+  GList *printers = gcp_object_get_printers (gcp,
+                                             access_token,
+                                             "ALL");
+
+  g_assert (printers != NULL);
+  const gchar *dialog_name = g_dbus_method_invocation_get_sender (invocation);
+  while (printers != NULL)
+  {
+    printer *printer_struct = printers->data;
+    gboolean is_accepting_jobs = FALSE;
+
+    gchar *printer_state = gcp_object_get_printer_state (gcp,
+                                                         access_token,
+                                                         printer_struct->id);
+    if(g_strcmp0 (printer_state, "ONLINE") == 0)
+      is_accepting_jobs = TRUE;
+
+
+    GVariant *gv = g_variant_new(PRINTER_ADDED_ARGS,
+                                 printer_struct->id,
+                                 printer_struct->name,
+                                 printer_struct->description,
+                                 printer_struct->location,
+                                 printer_struct->make_and_model,
+                                 is_accepting_jobs,
+                                 printer_state,
+                                 "GCP");
+
+   error = NULL;
+   g_dbus_connection_emit_signal(b->dbus_connection,
+                                dialog_name,          // destination bus name (dialog_name) or NULL to emit to all
+                                "/",
+                                "org.openprinting.PrintBackend",
+                                PRINTER_ADDED_SIGNAL,
+                                gv,
+                                &error);
+
+    g_print ("printer added signal emmitted\n");
+    printers = printers->next;
+  }
+
+  print_backend_complete_activate_backend (skeleton,
+                                           invocation);
+
+  g_object_unref (gcp);
+  return TRUE;
+}
+
+
+BackendObj *get_new_BackendObj()
+{
+    BackendObj *b_obj = (BackendObj *)(malloc(sizeof(BackendObj)));
+    b_obj->dbus_connection = NULL;
+    return b_obj;
+}
+
+int
+main ()
+{
+  b = get_new_BackendObj();
+  g_assert (b != NULL);
+  ServerObject *gcp_server = server_object_new ();
+
+  GMainLoop *loop = g_main_loop_new(NULL, FALSE);
+  g_main_loop_run(loop);
+
+  return 0;
 }

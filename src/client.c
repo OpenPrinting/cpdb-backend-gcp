@@ -19,6 +19,11 @@ main ()
 
   error = NULL;
 
+  g_print ("\n\n*******Activate Backend*******\n\n");
+  error = NULL;
+  print_backend_call_activate_backend_sync (proxy, NULL, &error);
+
+
   g_print ("\n\n*******List of Print Jobs*******\n\n");
   error = NULL;
   GVariant *print_jobs_dict;
@@ -44,14 +49,14 @@ main ()
 
   g_variant_iter_free (iter);
 
-  gchar *job_id = g_malloc (50);
-  g_print ("Enter id of job that you want to cancel:\n");
-  scanf ("%s", job_id);
-  g_print ("\n\n*******Test Delete Print Job*******\n\n");
-  gboolean delete_job_status;
-  print_backend_call_cancel_job_sync (proxy, job_id, &delete_job_status, NULL, &error);
-  g_print ("*******Delete Job Status*******\n");
-  g_print ("%d\n", delete_job_status);
+  // gchar *job_id = g_malloc (50);
+  // g_print ("Enter id of job that you want to cancel:\n");
+  // scanf ("%s", job_id);
+  // g_print ("\n\n*******Test Delete Print Job*******\n\n");
+  // gboolean delete_job_status;
+  // print_backend_call_cancel_job_sync (proxy, job_id, &delete_job_status, NULL, &error);
+  // g_print ("*******Delete Job Status*******\n");
+  // g_print ("%d\n", delete_job_status);
 
 
   gchar *printer_id = g_malloc (50);
@@ -69,7 +74,7 @@ main ()
   error = NULL;
   gboolean is_accepting_jobs;
   print_backend_call_is_accepting_jobs_sync (proxy, printer_id, &is_accepting_jobs, NULL, &error);
-  g_print ("*******Printer Status*******\n");
+  g_print ("*******Is Accepting Jobs*******\n");
   g_print ("%s => %d\n\n", printer_id, is_accepting_jobs);
 
 

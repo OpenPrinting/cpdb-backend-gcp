@@ -68,9 +68,9 @@ gcp_object_get_printers (GCPObject *self, const gchar *access_token, const gchar
 
   JsonObject *jobject = json_data_get_root (printers);
   JsonArray *jarray = get_array_from_json_object (jobject, "printers");
-  GList *printer_id_name_pairs = get_printer_struct_from_json_array (jarray, "id", "displayName");
+  GList *printer_struct_list = get_printer_struct_from_json_array (jarray, "id", "displayName", "description");
 
-  return printer_id_name_pairs;
+  return printer_struct_list;
 }
 
 GList *
@@ -340,7 +340,7 @@ gcp_object_real_cancel_print_job (GCPObject *self,
   if (res)
   {
     delete_job_status = rest_proxy_call_get_payload (call);
-    g_print ("%s\n", delete_job_status);
+    // g_print ("%s\n", delete_job_status);
   }
   else
   {

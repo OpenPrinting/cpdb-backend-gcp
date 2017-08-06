@@ -75,7 +75,8 @@ GList *get_glist_for_string_member_in_json_array (JsonArray *jarray,
 
 GList *get_printer_struct_from_json_array (JsonArray *jarray,
                                            const gchar *id,
-                                           const gchar *name)
+                                           const gchar *name,
+                                           const gchar *description)
 {
   GList *printer_structs_list = NULL;
   GList *jnodes = json_array_get_elements (jarray);
@@ -85,12 +86,20 @@ GList *get_printer_struct_from_json_array (JsonArray *jarray,
     g_assert (jobject != NULL);
     g_assert (json_object_has_member (jobject, id) == TRUE);
     g_assert (json_object_has_member (jobject, name) == TRUE);
+    g_assert (json_object_has_member (jobject, description) == TRUE);
     const gchar *id_ = json_object_get_string_member (jobject, id);
     const gchar *name_ = json_object_get_string_member (jobject, name);
+    const gchar *description_ = json_object_get_string_member (jobject, description);
 
     printer *printer_struct = g_malloc(sizeof (printer));
     printer_struct->id = g_strdup(id_);
     printer_struct->name = g_strdup(name_);
+    printer_struct->description = g_strdup(description_);
+
+    // TODO: Get the actual values
+    printer_struct->location = g_strdup("dummy_location");
+    printer_struct->make_and_model = g_strdup("dummy_make_and_model");
+
     printer_structs_list = g_list_append (printer_structs_list, (gpointer)printer_struct);
     jnodes = jnodes->next;
   }

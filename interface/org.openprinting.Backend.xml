@@ -10,8 +10,9 @@
             <arg name="printer_state" direction="out" type="s" />
             <arg name="backend_name" direction="out" type="s"/>
         </signal>
-        <signal name="PrinterRemoved">
-            <arg name="printer_id" type="s" />
+	      <signal name="PrinterRemoved">
+            <arg name="printer_id" type="s" direction="out"/>
+            <arg name="backend_name" type="s" direction="out"/>
         </signal>
         <method name="GetBackendName">
             <arg name="backend_name" direction="out" type="s" />
@@ -31,7 +32,8 @@
         <method name="GetAllOptions">
             <arg name="printer_id" direction="in" type="s" />
             <arg name="num_options" direction="out" type="i" />
-            <arg name="options" direction="out" type="a(ssia(s))" />
+	          <arg name="options" direction="out" type="a(ssia(s))" />
+	    <!--option contents: option name, default value , number of supported values , array of supported values-->
         </method>
         <method name="getActiveJobsCount">
             <arg name="printer_id" direction="in" type="s"/>
@@ -41,7 +43,7 @@
             <arg name="active_only" direction="in" type="b"/>
             <arg name="num_jobs" direction="out" type="i"/>
             <arg name="jobs" direction="out" type="a(ssssssi)"/>
-            <!--job contents: job-id , title, printer, user, state , submitted at , size -->
+            <!--job contents: job-id , title, printer-id, user, state , submitted at(time string) , size -->
         </method>
         <method name="cancelJob">
             <arg name="job_id" direction="in" type="s"/>

@@ -97,7 +97,8 @@ struct _PrintBackendIface
 
   void (*printer_removed) (
     PrintBackend *object,
-    const gchar *arg_printer_id);
+    const gchar *arg_printer_id,
+    const gchar *arg_backend_name);
 
 };
 
@@ -179,7 +180,8 @@ void print_backend_emit_printer_added (
 
 void print_backend_emit_printer_removed (
     PrintBackend *object,
-    const gchar *arg_printer_id);
+    const gchar *arg_printer_id,
+    const gchar *arg_backend_name);
 
 
 

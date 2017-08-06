@@ -11,7 +11,7 @@ genback:
 %.o: %.c
 	gcc -g -o $@ $^ -c $(FLAGS)
 
-server: server.o gcp_server.o backend_interface.o common_helper.o gcp.o
+server: gcp_server.o backend_interface.o common_helper.o gcp.o
 	gcc -g -o $@ $^ $(FLAGS)
 
 client: client.o backend_interface.o common_helper.o
