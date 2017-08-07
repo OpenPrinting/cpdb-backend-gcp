@@ -341,6 +341,7 @@ static gboolean
 on_handle_cancel_job (PrintBackend *skeleton,
                       GDBusMethodInvocation *invocation,
                       const gchar *job_id,
+                      const gchar *printer_id,
                       gpointer user_data)
 {
   g_print ("on_handle_is_accepting_jobs() called\n");

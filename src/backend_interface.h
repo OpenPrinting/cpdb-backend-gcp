@@ -36,7 +36,8 @@ struct _PrintBackendIface
   gboolean (*handle_cancel_job) (
     PrintBackend *object,
     GDBusMethodInvocation *invocation,
-    const gchar *arg_job_id);
+    const gchar *arg_job_id,
+    const gchar *arg_printer_id);
 
   gboolean (*handle_get_active_jobs_count) (
     PrintBackend *object,
@@ -345,6 +346,7 @@ gboolean print_backend_call_get_all_jobs_sync (
 void print_backend_call_cancel_job (
     PrintBackend *proxy,
     const gchar *arg_job_id,
+    const gchar *arg_printer_id,
     GCancellable *cancellable,
     GAsyncReadyCallback callback,
     gpointer user_data);
@@ -358,6 +360,7 @@ gboolean print_backend_call_cancel_job_finish (
 gboolean print_backend_call_cancel_job_sync (
     PrintBackend *proxy,
     const gchar *arg_job_id,
+    const gchar *arg_printer_id,
     gboolean *out_status,
     GCancellable *cancellable,
     GError **error);

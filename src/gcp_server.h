@@ -75,6 +75,7 @@ static gboolean
 on_handle_cancel_job (PrintBackend *skeleton,
                      GDBusMethodInvocation *invocation,
                      const gchar *job_id,
+                     const gchar *printer_id,
                      gpointer user_data);
 
 static gboolean

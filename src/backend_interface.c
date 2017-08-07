@@ -506,9 +506,21 @@ static const _ExtendedGDBusArgInfo _print_backend_method_info_cancel_job_IN_ARG_
   FALSE
 };
 
+static const _ExtendedGDBusArgInfo _print_backend_method_info_cancel_job_IN_ARG_printer_id =
+{
+  {
+    -1,
+    (gchar *) "printer_id",
+    (gchar *) "s",
+    NULL
+  },
+  FALSE
+};
+
 static const _ExtendedGDBusArgInfo * const _print_backend_method_info_cancel_job_IN_ARG_pointers[] =
 {
   &_print_backend_method_info_cancel_job_IN_ARG_job_id,
+  &_print_backend_method_info_cancel_job_IN_ARG_printer_id,
   NULL
 };
 
@@ -1094,6 +1106,7 @@ print_backend_default_init (PrintBackendIface *iface)
    * @object: A #PrintBackend.
    * @invocation: A #GDBusMethodInvocation.
    * @arg_job_id: Argument passed by remote caller.
+   * @arg_printer_id: Argument passed by remote caller.
    *
    * Signal emitted when a remote caller is invoking the <link linkend="gdbus-method-org-openprinting-PrintBackend.cancelJob">cancelJob()</link> D-Bus method.
    *
@@ -1109,8 +1122,8 @@ print_backend_default_init (PrintBackendIface *iface)
     NULL,
     g_cclosure_marshal_generic,
     G_TYPE_BOOLEAN,
-    2,
-    G_TYPE_DBUS_METHOD_INVOCATION, G_TYPE_STRING);
+    3,
+    G_TYPE_DBUS_METHOD_INVOCATION, G_TYPE_STRING, G_TYPE_STRING);
 
   /**
    * PrintBackend::handle-print-file:
@@ -2080,6 +2093,7 @@ _out:
  * print_backend_call_cancel_job:
  * @proxy: A #PrintBackendProxy.
  * @arg_job_id: Argument to pass with the method invocation.
+ * @arg_printer_id: Argument to pass with the method invocation.
  * @cancellable: (allow-none): A #GCancellable or %NULL.
  * @callback: A #GAsyncReadyCallback to call when the request is satisfied or %NULL.
  * @user_data: User data to pass to @callback.
@@ -2094,14 +2108,16 @@ void
 print_backend_call_cancel_job (
     PrintBackend *proxy,
     const gchar *arg_job_id,
+    const gchar *arg_printer_id,
     GCancellable *cancellable,
     GAsyncReadyCallback callback,
     gpointer user_data)
 {
   g_dbus_proxy_call (G_DBUS_PROXY (proxy),
     "cancelJob",
-    g_variant_new ("(s)",
-                   arg_job_id),
+    g_variant_new ("(ss)",
+                   arg_job_id,
+                   arg_printer_id),
     G_DBUS_CALL_FLAGS_NONE,
     -1,
     cancellable,
@@ -2143,6 +2159,7 @@ _out:
  * print_backend_call_cancel_job_sync:
  * @proxy: A #PrintBackendProxy.
  * @arg_job_id: Argument to pass with the method invocation.
+ * @arg_printer_id: Argument to pass with the method invocation.
  * @out_status: (out): Return location for return parameter or %NULL to ignore.
  * @cancellable: (allow-none): A #GCancellable or %NULL.
  * @error: Return location for error or %NULL.
@@ -2157,6 +2174,7 @@ gboolean
 print_backend_call_cancel_job_sync (
     PrintBackend *proxy,
     const gchar *arg_job_id,
+    const gchar *arg_printer_id,
     gboolean *out_status,
     GCancellable *cancellable,
     GError **error)
@@ -2164,8 +2182,9 @@ print_backend_call_cancel_job_sync (
   GVariant *_ret;
   _ret = g_dbus_proxy_call_sync (G_DBUS_PROXY (proxy),
     "cancelJob",
-    g_variant_new ("(s)",
-                   arg_job_id),
+    g_variant_new ("(ss)",
+                   arg_job_id,
+                   arg_printer_id),
     G_DBUS_CALL_FLAGS_NONE,
     -1,
     cancellable,

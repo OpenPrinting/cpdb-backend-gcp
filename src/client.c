@@ -45,16 +45,18 @@ main ()
   g_variant_iter_free (iter);
 
   // gchar *job_id = g_malloc (50);
-  // g_print ("Enter id of job that you want to cancel:\n");
+  gchar *printer_id = g_malloc (50);
+  // g_print ("Enter id of the job that you want to cancel:\n");
   // scanf ("%s", job_id);
+  // g_print ("Enter id of the printer:\n");
+  // scanf ("%s", printer_id);
   // g_print ("\n\n*******Test Delete Print Job*******\n\n");
   // gboolean delete_job_status;
-  // print_backend_call_cancel_job_sync (proxy, job_id, &delete_job_status, NULL, &error);
+  // print_backend_call_cancel_job_sync (proxy, job_id, printer_id, &delete_job_status, NULL, &error);
   // g_print ("*******Delete Job Status*******\n");
   // g_print ("%d\n", delete_job_status);
 
 
-  gchar *printer_id = g_malloc (50);
   g_print ("Enter id of printer to get printer status:\n");
   scanf ("%s", printer_id);
   error = NULL;
