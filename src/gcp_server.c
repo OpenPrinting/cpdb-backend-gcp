@@ -99,6 +99,18 @@ connect_to_signals (PrintBackend *skeleton)
                     "handle_get_backend_name",
                     G_CALLBACK (on_handle_get_backend_name),
                     NULL);
+
+  g_dbus_connection_signal_subscribe(b->dbus_connection,
+                                     NULL,                             //Sender name
+                                     "org.openprinting.PrintFrontend", //Sender interface
+                                     REFRESH_BACKEND_SIGNAL,           //Signal name
+                                     NULL,                             /**match on all object paths**/
+                                     NULL,                             /**match on all arguments**/
+                                     0,                                //Flags
+                                     on_refresh_backend,               //callback
+                                     NULL,                             //user_data
+                                     NULL);
+
 }
 
 
@@ -390,6 +402,9 @@ on_handle_activate_backend (PrintBackend *skeleton,
 
   g_assert (printers != NULL);
   const gchar *dialog_name = g_dbus_method_invocation_get_sender (invocation);
+
+  g_hash_table_insert (b->dialog_printers, (gpointer)dialog_name, (gpointer)printers);
+
   while (printers != NULL)
   {
     printer *printer_struct = printers->data;
@@ -444,11 +459,122 @@ on_handle_get_backend_name (PrintBackend *skeleton,
   return TRUE;
 }
 
+gint
+comp_function (gconstpointer data_a, gconstpointer data_b)
+{
+  printer *printer_struct_a = (printer *)data_a;
+  printer *printer_struct_b = (printer *)data_b;
+
+  return g_strcmp0 (printer_struct_a->id, printer_struct_b->id);
+}
+
+void
+refresh_printer_list(BackendObj *b, char *dialog_name)
+{
+    GCPObject *gcp = gcp_object_new ();
+
+    GError *error = NULL;
+    gchar *access_token = g_malloc (150);
+    gint expires_in;
+    gboolean res = get_access_token (&access_token, &expires_in, &error);
+    g_assert (res == TRUE);
+
+    GList *printers_new = gcp_object_get_printers (gcp,
+                                                   access_token,
+                                                   "ALL");
+    g_assert (printers_new != NULL);
+
+    GList *printers_old = NULL;
+    GList *temp = NULL;
+
+    // const gchar *dialog_name = g_dbus_method_invocation_get_sender (invocation);
+
+    printers_old = (GList *)g_hash_table_lookup (b->dialog_printers, (gconstpointer)dialog_name);
+    g_assert (printers_old != NULL);
+
+    // Look for new printers
+    temp = printers_new;
+    while (temp != NULL)
+    {
+      printer *printer_struct = temp->data;
+      if (g_list_find_custom (printers_old, (gconstpointer)printer_struct, comp_function) == NULL)
+      {
+        // new printer found, emit printer added signal
+        gboolean is_accepting_jobs = FALSE;
+
+        gchar *printer_state = gcp_object_get_printer_state (gcp,
+                                                             access_token,
+                                                             printer_struct->id);
+        if(g_strcmp0 (printer_state, "ONLINE") == 0)
+          is_accepting_jobs = TRUE;
+
+
+        GVariant *gv = g_variant_new(PRINTER_ADDED_ARGS,
+                                     printer_struct->id,
+                                     printer_struct->name,
+                                     printer_struct->description,
+                                     printer_struct->location,
+                                     printer_struct->make_and_model,
+                                     is_accepting_jobs,
+                                     printer_state,
+                                     "GCP");
+
+       error = NULL;
+       g_dbus_connection_emit_signal(b->dbus_connection,
+                                    dialog_name,          // destination bus name (dialog_name) or NULL to emit to all
+                                    "/",
+                                    "org.openprinting.PrintBackend",
+                                    PRINTER_ADDED_SIGNAL,
+                                    gv,
+                                    &error);
+
+      }
+      temp = temp->next;
+    }
+
+    // Look for deleted printers
+    temp = printers_old;
+    while (temp != NULL)
+    {
+      printer *printer_struct = temp->data;
+      if (g_list_find_custom (printers_new, (gconstpointer)printer_struct, comp_function) == NULL)
+      {
+        // printer deleted, emit printer removed signal
+        error = NULL;
+        g_dbus_connection_emit_signal(b->dbus_connection,
+                                      dialog_name,
+                                      "/",
+                                      "org.openprinting.PrintBackend",
+                                      PRINTER_REMOVED_SIGNAL,
+                                      g_variant_new("(ss)", printer_struct->name, "GCP"),
+                                      &error);
+        g_assert_no_error(error);
+      }
+      temp = temp->next;
+    }
+
+    g_hash_table_replace (b->dialog_printers, (gpointer)dialog_name, (gpointer)printers_new);
+}
+
+static void
+on_refresh_backend(GDBusConnection *connection,
+                   const gchar *sender_name,
+                   const gchar *object_path,
+                   const gchar *interface_name,
+                   const gchar *signal_name,
+                   GVariant *parameters,
+                   gpointer not_used)
+{
+  gchar *dialog_name = g_strdup (sender_name);
+  g_message ("Refresh backend signal from %s\n", dialog_name);
+  refresh_printer_list (b, dialog_name);
+}
 
 BackendObj *get_new_BackendObj()
 {
     BackendObj *b_obj = (BackendObj *)(malloc(sizeof(BackendObj)));
     b_obj->dbus_connection = NULL;
+    b_obj->dialog_printers = g_hash_table_new (g_str_hash, g_str_equal);
     return b_obj;
 }
 

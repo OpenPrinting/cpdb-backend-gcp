@@ -18,6 +18,7 @@ struct _ServerObjectClass
 typedef struct _BackendObj
 {
     GDBusConnection *dbus_connection;
+    GHashTable *dialog_printers;
 } BackendObj;
 
 ServerObject *
@@ -87,6 +88,21 @@ static gboolean
 on_handle_get_backend_name (PrintBackend *skeleton,
                             GDBusMethodInvocation *invocation,
                             gpointer user_data);
+
+gint
+comp_function (gconstpointer data_a, gconstpointer data_b);
+
+void
+refresh_printer_list(BackendObj *b, char *dialog_name);
+
+static void
+on_refresh_backend(GDBusConnection *connection,
+                   const gchar *sender_name,
+                   const gchar *object_path,
+                   const gchar *interface_name,
+                   const gchar *signal_name,
+                   GVariant *parameters,
+                   gpointer not_used);
 
 void connect_to_signals (PrintBackend *skeleton);
 
