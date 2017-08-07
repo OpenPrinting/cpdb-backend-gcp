@@ -381,6 +381,54 @@ on_handle_cancel_job (PrintBackend *skeleton,
   return TRUE;
 }
 
+void emit_printer_removed_signal (const gchar *dialog_name,
+                                  printer *printer_struct)
+{
+  GError *error = NULL;
+  g_dbus_connection_emit_signal(b->dbus_connection,
+                                dialog_name,
+                                "/",
+                                "org.openprinting.PrintBackend",
+                                PRINTER_REMOVED_SIGNAL,
+                                g_variant_new("(ss)", printer_struct->name, "GCP"),
+                                &error);
+  g_assert_no_error(error);
+}
+
+void emit_printer_added_signal (GCPObject *gcp,
+                                const gchar *access_token,
+                                const gchar *dialog_name,
+                                printer *printer_struct)
+{
+  GError *error = NULL;
+  gboolean is_accepting_jobs = FALSE;
+
+  gchar *printer_state = gcp_object_get_printer_state (gcp,
+                                                       access_token,
+                                                       printer_struct->id);
+  if(g_strcmp0 (printer_state, "ONLINE") == 0)
+    is_accepting_jobs = TRUE;
+
+
+  GVariant *gv = g_variant_new(PRINTER_ADDED_ARGS,
+                               printer_struct->id,
+                               printer_struct->name,
+                               printer_struct->description,
+                               printer_struct->location,
+                               printer_struct->make_and_model,
+                               is_accepting_jobs,
+                               printer_state,
+                               "GCP");
+
+  error = NULL;
+  g_dbus_connection_emit_signal(b->dbus_connection,
+                                dialog_name,          // destination bus name (dialog_name) or NULL to emit to all
+                                "/",
+                                "org.openprinting.PrintBackend",
+                                PRINTER_ADDED_SIGNAL,
+                                gv,
+                                &error);
+}
 
 static gboolean
 on_handle_activate_backend (PrintBackend *skeleton,
@@ -408,34 +456,7 @@ on_handle_activate_backend (PrintBackend *skeleton,
   while (printers != NULL)
   {
     printer *printer_struct = printers->data;
-    gboolean is_accepting_jobs = FALSE;
-
-    gchar *printer_state = gcp_object_get_printer_state (gcp,
-                                                         access_token,
-                                                         printer_struct->id);
-    if(g_strcmp0 (printer_state, "ONLINE") == 0)
-      is_accepting_jobs = TRUE;
-
-
-    GVariant *gv = g_variant_new(PRINTER_ADDED_ARGS,
-                                 printer_struct->id,
-                                 printer_struct->name,
-                                 printer_struct->description,
-                                 printer_struct->location,
-                                 printer_struct->make_and_model,
-                                 is_accepting_jobs,
-                                 printer_state,
-                                 "GCP");
-
-   error = NULL;
-   g_dbus_connection_emit_signal(b->dbus_connection,
-                                dialog_name,          // destination bus name (dialog_name) or NULL to emit to all
-                                "/",
-                                "org.openprinting.PrintBackend",
-                                PRINTER_ADDED_SIGNAL,
-                                gv,
-                                &error);
-
+    emit_printer_added_signal (gcp, access_token, dialog_name, printer_struct);
     g_print ("printer added signal emmitted\n");
     printers = printers->next;
   }
@@ -469,7 +490,7 @@ comp_function (gconstpointer data_a, gconstpointer data_b)
 }
 
 void
-refresh_printer_list(BackendObj *b, char *dialog_name)
+refresh_printer_list(char *dialog_name)
 {
     GCPObject *gcp = gcp_object_new ();
 
@@ -500,34 +521,7 @@ refresh_printer_list(BackendObj *b, char *dialog_name)
       if (g_list_find_custom (printers_old, (gconstpointer)printer_struct, comp_function) == NULL)
       {
         // new printer found, emit printer added signal
-        gboolean is_accepting_jobs = FALSE;
-
-        gchar *printer_state = gcp_object_get_printer_state (gcp,
-                                                             access_token,
-                                                             printer_struct->id);
-        if(g_strcmp0 (printer_state, "ONLINE") == 0)
-          is_accepting_jobs = TRUE;
-
-
-        GVariant *gv = g_variant_new(PRINTER_ADDED_ARGS,
-                                     printer_struct->id,
-                                     printer_struct->name,
-                                     printer_struct->description,
-                                     printer_struct->location,
-                                     printer_struct->make_and_model,
-                                     is_accepting_jobs,
-                                     printer_state,
-                                     "GCP");
-
-       error = NULL;
-       g_dbus_connection_emit_signal(b->dbus_connection,
-                                    dialog_name,          // destination bus name (dialog_name) or NULL to emit to all
-                                    "/",
-                                    "org.openprinting.PrintBackend",
-                                    PRINTER_ADDED_SIGNAL,
-                                    gv,
-                                    &error);
-
+        emit_printer_added_signal (gcp, access_token, dialog_name, printer_struct);
       }
       temp = temp->next;
     }
@@ -540,15 +534,7 @@ refresh_printer_list(BackendObj *b, char *dialog_name)
       if (g_list_find_custom (printers_new, (gconstpointer)printer_struct, comp_function) == NULL)
       {
         // printer deleted, emit printer removed signal
-        error = NULL;
-        g_dbus_connection_emit_signal(b->dbus_connection,
-                                      dialog_name,
-                                      "/",
-                                      "org.openprinting.PrintBackend",
-                                      PRINTER_REMOVED_SIGNAL,
-                                      g_variant_new("(ss)", printer_struct->name, "GCP"),
-                                      &error);
-        g_assert_no_error(error);
+        emit_printer_removed_signal (dialog_name, printer_struct);
       }
       temp = temp->next;
     }
@@ -567,7 +553,7 @@ on_refresh_backend(GDBusConnection *connection,
 {
   gchar *dialog_name = g_strdup (sender_name);
   g_message ("Refresh backend signal from %s\n", dialog_name);
-  refresh_printer_list (b, dialog_name);
+  refresh_printer_list (dialog_name);
 }
 
 BackendObj *get_new_BackendObj()

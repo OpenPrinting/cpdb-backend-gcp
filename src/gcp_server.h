@@ -93,7 +93,7 @@ gint
 comp_function (gconstpointer data_a, gconstpointer data_b);
 
 void
-refresh_printer_list(BackendObj *b, char *dialog_name);
+refresh_printer_list(char *dialog_name);
 
 static void
 on_refresh_backend(GDBusConnection *connection,
@@ -105,6 +105,14 @@ on_refresh_backend(GDBusConnection *connection,
                    gpointer not_used);
 
 void connect_to_signals (PrintBackend *skeleton);
+
+void emit_printer_added_signal (GCPObject *gcp,
+                                const gchar *access_token,
+                                const gchar *dialog_name,
+                                printer *printer_struct);
+
+void emit_printer_removed_signal (const gchar *dialog_name,
+                                  printer *printer_struct);
 
 BackendObj *get_new_BackendObj();
 
