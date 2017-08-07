@@ -94,6 +94,11 @@ connect_to_signals (PrintBackend *skeleton)
                     "handle_activate_backend",
                     G_CALLBACK (on_handle_activate_backend),
                     NULL);
+
+  g_signal_connect (skeleton,
+                    "handle_get_backend_name",
+                    G_CALLBACK (on_handle_get_backend_name),
+                    NULL);
 }
 
 
@@ -424,6 +429,18 @@ on_handle_activate_backend (PrintBackend *skeleton,
                                            invocation);
 
   g_object_unref (gcp);
+  return TRUE;
+}
+
+static gboolean
+on_handle_get_backend_name (PrintBackend *skeleton,
+                            GDBusMethodInvocation *invocation,
+                            gpointer user_data)
+{
+  g_print ("on_handle_get_backend_name() called\n");
+  print_backend_complete_get_backend_name (skeleton,
+                                           invocation,
+                                           "GCP");
   return TRUE;
 }
 

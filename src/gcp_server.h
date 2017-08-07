@@ -83,6 +83,11 @@ on_handle_activate_backend (PrintBackend *skeleton,
                             GDBusMethodInvocation *invocation,
                             gpointer user_data);
 
+static gboolean
+on_handle_get_backend_name (PrintBackend *skeleton,
+                            GDBusMethodInvocation *invocation,
+                            gpointer user_data);
+
 void connect_to_signals (PrintBackend *skeleton);
 
 BackendObj *get_new_BackendObj();

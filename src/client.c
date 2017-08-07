@@ -14,6 +14,12 @@ main ()
 
   error = NULL;
 
+  g_print ("\n\n*******Get Backend Name*******\n\n");
+  error = NULL;
+  gchar *backend_name;
+  print_backend_call_get_backend_name_sync (proxy, &backend_name, NULL, &error);
+  g_print ("Backend Name => %s\n", backend_name);
+
   g_print ("\n\n*******Activate Backend*******\n\n");
   error = NULL;
   print_backend_call_activate_backend_sync (proxy, NULL, &error);
