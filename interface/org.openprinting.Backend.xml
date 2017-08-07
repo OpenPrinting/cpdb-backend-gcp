@@ -47,6 +47,7 @@
         </method>
         <method name="cancelJob">
             <arg name="job_id" direction="in" type="s"/>
+            <arg name="printer_id" direction="in" type="s"/>
             <arg name="status" direction="out" type="b"/>
         </method>
         <method name="printFile">
