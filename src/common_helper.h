@@ -7,6 +7,7 @@
 #include <rest/rest-proxy-call.h>
 #include <json-glib/json-glib.h>
 #include <goa/goa.h>
+#include <string.h>
 #include "backend_interface.h"
 
 #define PRINTER_ADDED_ARGS "(sssssbss)"

@@ -16,4 +16,8 @@ cp ../aux/org.openprinting.Backend.GCP /usr/share/print-backends
 
 echo "creating directory for log file at  ~/.print-backends/logs/"
 mkdir -p ~/.print_backends/logs/
+
+echo "removing binary files from current directory"
+make clean
+
 echo "Done."

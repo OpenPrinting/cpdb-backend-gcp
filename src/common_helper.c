@@ -94,18 +94,42 @@ GList *get_printer_struct_from_json_array (JsonArray *jarray,
     printer *printer_struct = g_malloc(sizeof (printer));
     printer_struct->id = g_strdup(id_);
     printer_struct->name = g_strdup(name_);
-    printer_struct->description = g_strdup(description_);
+    if (g_strcmp0(description_, g_strdup("")) == 0)
+    {
+      printer_struct->description = g_strdup("NA");
+    }
+    else
+    {
+      printer_struct->description = g_strdup(description_);
+    }
+    printer_struct->location = g_strdup("NA");
+    printer_struct->make_and_model = g_strdup("NA");
 
-    // TODO: Get the actual values
-    printer_struct->location = g_strdup("dummy_location");
-    printer_struct->make_and_model = g_strdup("dummy_make_and_model");
+    JsonArray *tags_array = get_array_from_json_object (jobject, "tags");
+    GList *tags_json_nodes = json_array_get_elements (tags_array);
+    int i = 0;
+    while (tags_json_nodes != NULL)
+    {
+      const gchar *str_element = json_array_get_string_element (tags_array, i);
+      gchar *loc_pointer = g_strrstr (str_element, "__cp__printer-location");
+      if (loc_pointer != NULL)
+      {
+        printer_struct->location = g_strdup(loc_pointer+(strlen("__cp__printer-location")+1));
+      }
+      loc_pointer = g_strrstr (str_element, "__cp__printer-make-and-model");
+      if (loc_pointer != NULL)
+      {
+        printer_struct->make_and_model = g_strdup(loc_pointer+(strlen("__cp__printer-make-and-model")+1));
+      }
+      i++;
+      tags_json_nodes = tags_json_nodes->next;
+    }
 
     printer_structs_list = g_list_append (printer_structs_list, (gpointer)printer_struct);
     jnodes = jnodes->next;
   }
   return printer_structs_list;
 }
-
 
 gboolean get_access_token (gchar **out_access_token,
                            gint *out_expires_in,
