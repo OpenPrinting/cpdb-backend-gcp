@@ -13,7 +13,7 @@ gcp_object_real_get_printer_options (GCPObject   *self,
                                      const gchar *uid,
                                      const gchar *access_token);
 
-gboolean
+const gchar *
 gcp_object_real_submit_print_job (GCPObject   *self,
                                   const gchar *uid,
                                   const gchar *access_token,
@@ -124,7 +124,7 @@ gcp_object_get_vendor_capability_options (GCPObject   *self,
   return vendor_capability_list;
 }
 
-gboolean
+const gchar *
 gcp_object_submit_print_job (GCPObject   *self,
                              const gchar *uid,
                              const gchar *access_token,
@@ -134,8 +134,7 @@ gcp_object_submit_print_job (GCPObject   *self,
   g_return_val_if_fail (GCP_IS_OBJECT (self), FALSE);
 
   GCPObjectClass *klass = GCP_OBJECT_GET_CLASS (self);
-  gboolean res = FALSE;
-  res = klass->submit_print_job (self, uid, access_token, title, ticket);
+  const gchar  *res = klass->submit_print_job (self, uid, access_token, title, ticket);
 
   return res;
 }
@@ -243,7 +242,7 @@ gcp_object_real_get_printer_options (GCPObject   *self,
   return printer_options;
 }
 
-gboolean
+const gchar *
 gcp_object_real_submit_print_job (GCPObject   *self,
                                   const gchar *uid,
                                   const gchar *access_token,
@@ -251,7 +250,7 @@ gcp_object_real_submit_print_job (GCPObject   *self,
                                   const gchar *ticket)
 {
   /* TODO: Make api request to submit a file for printing. */
-  return TRUE;
+  return "success";
 }
 
 const gchar *

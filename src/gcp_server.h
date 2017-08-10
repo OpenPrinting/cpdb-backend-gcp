@@ -89,6 +89,15 @@ on_handle_get_backend_name (PrintBackend *skeleton,
                             GDBusMethodInvocation *invocation,
                             gpointer user_data);
 
+static gboolean
+on_handle_print_file (PrintBackend *skeleton,
+                      GDBusMethodInvocation *invocation,
+                      const gchar *printer_id,
+                      const gchar *file_path_name,
+                      gint num_settings,
+                      GVariant *settings,
+                      gpointer user_data);
+
 gint
 comp_function (gconstpointer data_a, gconstpointer data_b);
 

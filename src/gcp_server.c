@@ -100,6 +100,11 @@ connect_to_signals (PrintBackend *skeleton)
                     G_CALLBACK (on_handle_get_backend_name),
                     NULL);
 
+  g_signal_connect (skeleton,
+                    "handle_print_file",
+                    G_CALLBACK (on_handle_print_file),
+                    NULL);
+
   g_dbus_connection_signal_subscribe(b->dbus_connection,
                                      NULL,                             //Sender name
                                      "org.openprinting.PrintFrontend", //Sender interface
@@ -184,18 +189,18 @@ on_handle_get_all_options (PrintBackend *skeleton,
   return TRUE;
 }
 
-// static gboolean
-// on_handle_submit_print_job (PrintBackend *skeleton,
-//                             GDBusMethodInvocation *invocation,
-//                             const gchar *uid,
-//                             const gchar *access_token,
-//                             const gchar *title,
-//                             const gchar *ticket,
-//                             gpointer user_data)
-// {
-//   /* TODO: Implement on_handle_submit_print_job() */
-//   return FALSE;
-// }
+static gboolean
+on_handle_print_file (PrintBackend *skeleton,
+                      GDBusMethodInvocation *invocation,
+                      const gchar *printer_id,
+                      const gchar *file_path_name,
+                      gint num_settings,
+                      GVariant *settings,
+                      gpointer user_data)
+{
+  /* TODO: Implement on_handle_print_file() */
+  return FALSE;
+}
 
 static gboolean
 on_handle_get_all_jobs (PrintBackend *skeleton,

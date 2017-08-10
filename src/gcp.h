@@ -22,11 +22,11 @@ struct _GCPObjectClass
                                   const gchar *,
                                   const gchar *);
 
-  gboolean (*submit_print_job) (GCPObject *,
-                                const gchar *,
-                                const gchar *,
-                                const gchar *,
-                                const gchar *);
+  const gchar * (*submit_print_job) (GCPObject *,
+                                     const gchar *,
+                                     const gchar *,
+                                     const gchar *,
+                                     const gchar *);
 
   const gchar * (*get_print_jobs) (GCPObject *,
                                    const gchar *,
@@ -59,7 +59,7 @@ gcp_object_get_vendor_capability_options (GCPObject   *self,
                                           const gchar *uid,
                                           const gchar *access_token);
 
-gboolean
+const gchar *
 gcp_object_submit_print_job (GCPObject   *self,
                              const gchar *uid,
                              const gchar *access_token,
