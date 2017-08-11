@@ -612,7 +612,7 @@ static const _ExtendedGDBusArgInfo _print_backend_method_info_print_file_OUT_ARG
   {
     -1,
     (gchar *) "jobid",
-    (gchar *) "i",
+    (gchar *) "s",
     NULL
   },
   FALSE
@@ -2255,7 +2255,7 @@ print_backend_call_print_file (
 gboolean
 print_backend_call_print_file_finish (
     PrintBackend *proxy,
-    gint *out_jobid,
+    gchar **out_jobid,
     GAsyncResult *res,
     GError **error)
 {
@@ -2264,7 +2264,7 @@ print_backend_call_print_file_finish (
   if (_ret == NULL)
     goto _out;
   g_variant_get (_ret,
-                 "(i)",
+                 "(s)",
                  out_jobid);
   g_variant_unref (_ret);
 _out:
@@ -2295,7 +2295,7 @@ print_backend_call_print_file_sync (
     const gchar *arg_file_path_name,
     gint arg_num_settings,
     GVariant *arg_settings,
-    gint *out_jobid,
+    gchar **out_jobid,
     GCancellable *cancellable,
     GError **error)
 {
@@ -2314,7 +2314,7 @@ print_backend_call_print_file_sync (
   if (_ret == NULL)
     goto _out;
   g_variant_get (_ret,
-                 "(i)",
+                 "(s)",
                  out_jobid);
   g_variant_unref (_ret);
 _out:
@@ -2625,10 +2625,10 @@ void
 print_backend_complete_print_file (
     PrintBackend *object,
     GDBusMethodInvocation *invocation,
-    gint jobid)
+    const gchar *jobid)
 {
   g_dbus_method_invocation_return_value (invocation,
-    g_variant_new ("(i)",
+    g_variant_new ("(s)",
                    jobid));
 }
 

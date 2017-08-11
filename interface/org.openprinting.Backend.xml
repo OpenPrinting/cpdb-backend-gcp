@@ -55,7 +55,7 @@
             <arg name="file_path_name" direction="in" type="s"/>
             <arg name="num_settings" direction="in" type="i"/>
             <arg name="settings" direction="in" type="a(ss)"/>
-            <arg name="jobid" direction="out" type="i" />
+            <arg name="jobid" direction="out" type="s" />
         </method>
         <!--Just for testing, will be removed finally-->
         <method name="ping">

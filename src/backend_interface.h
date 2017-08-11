@@ -159,7 +159,7 @@ void print_backend_complete_cancel_job (
 void print_backend_complete_print_file (
     PrintBackend *object,
     GDBusMethodInvocation *invocation,
-    gint jobid);
+    const gchar *jobid);
 
 void print_backend_complete_ping (
     PrintBackend *object,
@@ -377,7 +377,7 @@ void print_backend_call_print_file (
 
 gboolean print_backend_call_print_file_finish (
     PrintBackend *proxy,
-    gint *out_jobid,
+    gchar **out_jobid,
     GAsyncResult *res,
     GError **error);
 
@@ -387,7 +387,7 @@ gboolean print_backend_call_print_file_sync (
     const gchar *arg_file_path_name,
     gint arg_num_settings,
     GVariant *arg_settings,
-    gint *out_jobid,
+    gchar **out_jobid,
     GCancellable *cancellable,
     GError **error);
 
