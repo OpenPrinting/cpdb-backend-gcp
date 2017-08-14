@@ -20,6 +20,23 @@ main ()
   print_backend_call_get_backend_name_sync (proxy, &backend_name, NULL, &error);
   g_print ("Backend Name => %s\n", backend_name);
 
+  g_print ("\n\n*******Testing Submit Print File*******\n\n");
+  error = NULL;
+  gchar *test_printer_id = g_strdup ("0ec6dd1e-f113-615c-5283-54ac7c389049");
+  gchar *file_path_name = g_strdup ("/home/abhi/Desktop/fee.pdf");
+  gint num_settings = 0;
+  GVariant *settings;
+  gchar *out_job_id;
+  GVariantBuilder *builder;
+  builder = g_variant_builder_new (G_VARIANT_TYPE ("a(ss)"));
+  g_variant_builder_add (builder, "(ss)", "setting1_name", "setting1_value");
+  g_variant_builder_add (builder, "(ss)", "setting2_name", "setting2_value");
+  settings = g_variant_builder_end (builder);
+
+  print_backend_call_print_file_sync (proxy, test_printer_id, file_path_name, num_settings, settings, &out_job_id, NULL, &error);
+  g_print ("Out job id => %s\n", out_job_id);
+
+
   g_print ("\n\n*******Activate Backend*******\n\n");
   error = NULL;
   print_backend_call_activate_backend_sync (proxy, NULL, &error);

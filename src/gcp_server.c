@@ -198,8 +198,47 @@ on_handle_print_file (PrintBackend *skeleton,
                       GVariant *settings,
                       gpointer user_data)
 {
-  /* TODO: Implement on_handle_print_file() */
-  return FALSE;
+  g_print ("on_handle_print_file() called\n");
+  GCPObject *gcp = gcp_object_new ();
+  GError *error = NULL;
+  gchar *access_token = g_malloc (150);
+  gint expires_in;
+  gboolean res = get_access_token (&access_token, &expires_in, &error);
+  g_assert (res == TRUE);
+
+  time_t rawtime;
+  struct tm * timeinfo;
+
+  time ( &rawtime );
+  timeinfo = localtime ( &rawtime );
+
+  const gchar *title = g_strconcat (printer_id, file_path_name, asctime (timeinfo), NULL);
+  g_print ("title => %s\n",title);
+  const gchar *content_type = "text/plain";
+
+  /* TODO: Create the actual print ticket from settings GVariant */
+  gchar *ticket = "{\
+  \"version\": \"1.0\",\
+  \"print\": {\
+    \"vendor_ticket_item\": [],\
+    \"color\": {\"type\": \"STANDARD_MONOCHROME\"},\
+    \"copies\": {\"copies\": 1}\
+  }\
+  }";
+  const gchar *job_id = gcp_object_submit_print_job (gcp,
+                                                     printer_id,
+                                                     access_token,
+                                                     title,
+                                                     file_path_name,
+                                                     content_type,
+                                                     ticket);
+
+  print_backend_complete_print_file (skeleton,
+                                     invocation,
+                                     job_id);
+
+  g_object_unref (gcp);
+  return TRUE;
 }
 
 static gboolean

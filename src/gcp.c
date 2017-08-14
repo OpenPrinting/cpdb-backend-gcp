@@ -18,6 +18,8 @@ gcp_object_real_submit_print_job (GCPObject   *self,
                                   const gchar *uid,
                                   const gchar *access_token,
                                   const gchar *title,
+                                  const gchar *file_path_name,
+                                  const gchar *content_type,
                                   const gchar *ticket);
 
 const gchar *
@@ -129,14 +131,19 @@ gcp_object_submit_print_job (GCPObject   *self,
                              const gchar *uid,
                              const gchar *access_token,
                              const gchar *title,
+                             const gchar *file_path_name,
+                             const gchar *content_type,
                              const gchar *ticket)
 {
   g_return_val_if_fail (GCP_IS_OBJECT (self), FALSE);
 
   GCPObjectClass *klass = GCP_OBJECT_GET_CLASS (self);
-  const gchar  *res = klass->submit_print_job (self, uid, access_token, title, ticket);
 
-  return res;
+  const gchar *res = klass->submit_print_job (self, uid, access_token, title, file_path_name, content_type, ticket);
+  JsonObject *root = json_data_get_root (res);
+  const gchar *job_id = get_job_id_for_submitted_job (root);
+
+  return job_id;
 }
 
 GList *
@@ -247,10 +254,58 @@ gcp_object_real_submit_print_job (GCPObject   *self,
                                   const gchar *uid,
                                   const gchar *access_token,
                                   const gchar *title,
+                                  const gchar *file_path_name,
+                                  const gchar *content_type,
                                   const gchar *ticket)
 {
   /* TODO: Make api request to submit a file for printing. */
-  return "success";
+  RestProxy *proxy;
+  RestProxyCall *call;
+
+  const gchar *header = "Authorization";
+  const gchar *header_value = "Common Printing Dialog";
+  const gchar *method = "GET";
+  const gchar *function = "submit";
+  const gchar *param_access_token = "access_token";
+  const gchar *param_printer_id = "printerid";
+  const gchar *param_title = "title";
+  const gchar *param_ticket = "ticket";
+  const gchar *param_content = "content";
+  const gchar *param_content_type = "contentType";
+
+  gboolean res = FALSE;
+  FILE *fp;
+  fp=fopen(file_path_name, "r");
+
+  proxy = rest_proxy_new ("https://www.google.com/cloudprint/", FALSE);
+  call = rest_proxy_new_call (proxy);
+  res = make_api_request (proxy,
+                          &call,
+                          method,
+                          function,
+                          header, header_value,
+                          param_access_token, access_token,
+                          param_printer_id, uid,
+                          param_title, title,
+                          param_ticket, ticket,
+                          param_content, fp,
+                          param_content_type, content_type,
+                          NULL);
+
+  const gchar *submit_print_job_status;
+
+  if (res)
+  {
+    submit_print_job_status = rest_proxy_call_get_payload (call);
+  }
+  else
+  {
+    submit_print_job_status = g_strdup("API request failed!");
+  }
+
+  /* TODO: Error handling in case something goes wrong. */
+
+  return submit_print_job_status;
 }
 
 const gchar *

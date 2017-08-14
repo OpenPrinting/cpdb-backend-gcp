@@ -3,6 +3,7 @@
 
 #include <glib.h>
 #include <glib-object.h>
+#include <time.h>
 #include "gcp.h"
 
 G_BEGIN_DECLS

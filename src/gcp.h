@@ -26,6 +26,8 @@ struct _GCPObjectClass
                                      const gchar *,
                                      const gchar *,
                                      const gchar *,
+                                     const gchar *,
+                                     const gchar *,
                                      const gchar *);
 
   const gchar * (*get_print_jobs) (GCPObject *,
@@ -64,6 +66,8 @@ gcp_object_submit_print_job (GCPObject   *self,
                              const gchar *uid,
                              const gchar *access_token,
                              const gchar *title,
+                             const gchar *file_path_name,
+                             const gchar *content_type,
                              const gchar *ticket);
 
 GList *

@@ -8,6 +8,7 @@
 #include <json-glib/json-glib.h>
 #include <goa/goa.h>
 #include <string.h>
+#include <stdio.h>
 #include "backend_interface.h"
 
 #define PRINTER_ADDED_ARGS "(sssssbss)"
@@ -91,6 +92,8 @@ GList *get_print_jobs_list (JsonArray *jarray);
 gchar *get_printer_state_from_printers_array (JsonArray *jarray, const gchar *uid);
 
 gboolean get_print_job_cancellation_status (JsonObject *jobject);
+
+const gchar *get_job_id_for_submitted_job (JsonObject *jobject);
 
 void connect_to_dbus (GDBusConnection *connection,
                       PrintBackend *skeleton,

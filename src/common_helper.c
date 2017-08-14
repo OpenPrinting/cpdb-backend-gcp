@@ -346,3 +346,20 @@ gboolean get_print_job_cancellation_status (JsonObject *jobject)
   gboolean success_status = json_object_get_boolean_member (jobject, "success");
   return success_status;
 }
+
+const gchar *get_job_id_for_submitted_job (JsonObject *jobject)
+{
+  gboolean success_status = json_object_get_boolean_member (jobject, "success");
+  if (success_status)
+  {
+    JsonNode *job = json_object_get_member (jobject, "job");
+    JsonObject *job_object = json_node_get_object (job);
+    const gchar *job_id = json_object_get_string_member (job_object, "id");
+    return job_id;
+  }
+  else
+  {
+    const gchar *job_id = "Error submitting job!";
+    return job_id;
+  }
+}
