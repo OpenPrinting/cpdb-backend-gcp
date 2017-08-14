@@ -369,7 +369,7 @@ gcp_object_real_cancel_print_job (GCPObject *self,
   RestProxy *proxy;
   RestProxyCall *call;
 
-  const gchar *header = "X-CloudPrint-Proxy";
+  const gchar *header = "Authorization";
   const gchar *header_value = "Common Printing Dialog";
   const gchar *method = "GET";
   const gchar *function = "deletejob";
