@@ -205,6 +205,48 @@ GList *get_media_size_options (JsonArray *jarray)
   return media_size_options;
 }
 
+GList *get_google_docs_vendor_capability_options (JsonArray *jarray)
+{
+  GList *vendor_capability_list = NULL;
+  GList *vendor_capability_nodes = json_array_get_elements (jarray);
+  while (vendor_capability_nodes != NULL)
+  {
+    JsonObject *jobject = json_node_get_object (vendor_capability_nodes->data);
+    g_assert (jobject != NULL);
+    g_assert (json_object_has_member (jobject, "id") == TRUE);
+    g_assert (json_object_has_member (jobject, "display_name") == TRUE);
+    g_assert (json_object_has_member (jobject, "type") == TRUE);
+    g_assert (json_object_has_member (jobject, "typed_value_cap") == TRUE);
+
+    const gchar *display_name = json_object_get_string_member (jobject, "display_name");
+    JsonNode *typed_value_cap_node = json_object_get_member (jobject, "typed_value_cap");
+    JsonObject *typed_value_cap_obj = json_node_get_object (typed_value_cap_node);
+    const gchar *value_type = json_object_get_string_member (typed_value_cap_obj, "value_type");
+
+    vendor_capability *capabilities = g_malloc (sizeof (vendor_capability));
+    capabilities->display_name = g_strdup (display_name);
+    capabilities->num_supported = 1;
+    capabilities->options = NULL;
+
+    const gchar *option_display_name = g_strdup ("Save to Google Drive");
+    gboolean option_is_default = TRUE;
+    const gchar *value = g_strdup ("Save to Google Drive");
+
+    vendor_capability_option *vc_option = g_malloc (sizeof (vendor_capability_option));
+    vc_option->display_name = g_strdup (option_display_name);
+    vc_option->is_default = option_is_default;
+    vc_option->value = g_strdup (value);
+
+    capabilities->options = g_list_append (capabilities->options, (gpointer)vc_option);
+
+    capabilities->default_value = g_strdup("Save to Google Drive");
+
+    vendor_capability_list = g_list_append (vendor_capability_list, (gpointer)capabilities);
+    vendor_capability_nodes = vendor_capability_nodes->next;
+  }
+  return vendor_capability_list;
+}
+
 GList *get_vendor_capability_options (JsonArray *jarray)
 {
   GList *vendor_capability_list = NULL;

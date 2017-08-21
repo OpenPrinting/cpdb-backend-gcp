@@ -121,9 +121,10 @@ gcp_object_get_vendor_capability_options (GCPObject   *self,
   JsonObject *printer_options = json_node_get_object (printer_node);
   JsonArray *vendor_capability_array = get_array_from_json_object (printer_options, "vendor_capability");
 
-  GList *vendor_capability_list = get_vendor_capability_options (vendor_capability_array);
-
-  return vendor_capability_list;
+  if(g_strcmp0 (uid, "__google__docs") == 0)
+    return get_google_docs_vendor_capability_options (vendor_capability_array);
+  else
+    return get_vendor_capability_options (vendor_capability_array);
 }
 
 const gchar *

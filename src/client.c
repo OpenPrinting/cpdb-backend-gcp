@@ -22,7 +22,8 @@ main ()
 
   g_print ("\n\n*******Testing Submit Print File*******\n\n");
   error = NULL;
-  gchar *test_printer_id = g_strdup ("0ec6dd1e-f113-615c-5283-54ac7c389049");
+  // gchar *test_printer_id = g_strdup ("0ec6dd1e-f113-615c-5283-54ac7c389049");
+  gchar *test_printer_id = g_strdup ("__google__docs");
   gchar *file_path_name = g_strdup ("/home/abhi/Desktop/fee.pdf");
   gint num_settings = 0;
   GVariant *settings;

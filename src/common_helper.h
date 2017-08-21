@@ -88,6 +88,8 @@ GList *get_media_size_options (JsonArray *jarray);
 
 GList *get_vendor_capability_options (JsonArray *array);
 
+GList *get_google_docs_vendor_capability_options (JsonArray *jarray);
+
 GList *get_print_jobs_list (JsonArray *jarray);
 
 gchar *get_printer_state_from_printers_array (JsonArray *jarray, const gchar *uid);
