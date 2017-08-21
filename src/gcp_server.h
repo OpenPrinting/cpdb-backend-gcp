@@ -114,6 +114,14 @@ on_refresh_backend(GDBusConnection *connection,
                    GVariant *parameters,
                    gpointer not_used);
 
+static void on_stop_backend(GDBusConnection *connection,
+                            const gchar *sender_name,
+                            const gchar *object_path,
+                            const gchar *interface_name,
+                            const gchar *signal_name,
+                            GVariant *parameters,
+                            gpointer not_used);
+
 void connect_to_signals (PrintBackend *skeleton);
 
 void emit_printer_added_signal (GCPObject *gcp,

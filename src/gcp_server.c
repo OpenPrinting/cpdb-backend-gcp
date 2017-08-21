@@ -105,17 +105,27 @@ connect_to_signals (PrintBackend *skeleton)
                     G_CALLBACK (on_handle_print_file),
                     NULL);
 
-  g_dbus_connection_signal_subscribe(b->dbus_connection,
-                                     NULL,                             //Sender name
-                                     "org.openprinting.PrintFrontend", //Sender interface
-                                     REFRESH_BACKEND_SIGNAL,           //Signal name
-                                     NULL,                             /**match on all object paths**/
-                                     NULL,                             /**match on all arguments**/
-                                     0,                                //Flags
-                                     on_refresh_backend,               //callback
-                                     NULL,                             //user_data
-                                     NULL);
+  g_dbus_connection_signal_subscribe (b->dbus_connection,
+                                      NULL,                             //Sender name
+                                      "org.openprinting.PrintFrontend", //Sender interface
+                                      REFRESH_BACKEND_SIGNAL,           //Signal name
+                                      NULL,                             /**match on all object paths**/
+                                      NULL,                             /**match on all arguments**/
+                                      0,                                //Flags
+                                      on_refresh_backend,               //callback
+                                      NULL,                             //user_data
+                                      NULL);
 
+  g_dbus_connection_signal_subscribe (b->dbus_connection,
+                                      NULL,                             //Sender name
+                                      "org.openprinting.PrintFrontend", //Sender interface
+                                      STOP_BACKEND_SIGNAL,              //Signal name
+                                      NULL,                             /**match on all object paths**/
+                                      NULL,                             /**match on all arguments**/
+                                      0,                                //Flags
+                                      on_stop_backend,                  //callback
+                                      NULL,                             //user_data
+                                      NULL);                                      
 }
 
 
@@ -598,6 +608,19 @@ on_refresh_backend(GDBusConnection *connection,
   gchar *dialog_name = g_strdup (sender_name);
   g_message ("Refresh backend signal from %s\n", dialog_name);
   refresh_printer_list (dialog_name);
+}
+
+static void on_stop_backend(GDBusConnection *connection,
+                            const gchar *sender_name,
+                            const gchar *object_path,
+                            const gchar *interface_name,
+                            const gchar *signal_name,
+                            GVariant *parameters,
+                            gpointer not_used)
+{
+  gchar *dialog_name = g_strdup (sender_name);
+  g_message("Stop backend signal from %s\n", dialog_name);
+  exit (EXIT_SUCCESS);
 }
 
 BackendObj *get_new_BackendObj()

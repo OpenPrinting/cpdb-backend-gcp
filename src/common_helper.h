@@ -15,6 +15,7 @@
 #define PRINTER_ADDED_SIGNAL "PrinterAdded"
 #define REFRESH_BACKEND_SIGNAL "RefreshBackend"
 #define PRINTER_REMOVED_SIGNAL "PrinterRemoved"
+#define STOP_BACKEND_SIGNAL "StopListing"
 
 typedef struct media_size{
   gint height_microns;
