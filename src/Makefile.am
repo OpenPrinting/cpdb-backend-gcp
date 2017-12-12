@@ -1,0 +1,21 @@
+backenddir = $(CPDB_BACKEND_DIR)
+backend_PROGRAMS = gcp
+gcp_SOURCES = gcp.c gcp_server.c common_helper.c
+gcp_CPPFLAGS  = $(CPDBBACKEND_CFLAGS)
+gcp_CPPFLAGS += $(GLIB_CFLAGS)
+gcp_CPPFLAGS += $(GIO_CFLAGS)
+gcp_CPPFLAGS += $(GIOUNIX_CFLAGS)
+gcp_CPPFLAGS += $(GOBJECT_CFLAGS)
+gcp_CPPFLAGS += $(REST_CFLAGS)
+gcp_CPPFLAGS += $(JSONGLIB_CFLAGS)
+gcp_CPPFLAGS += $(GOA_CFLAGS)
+
+gcp_LDADD  =  $(CPDBBACKEND_LIBS)
+gcp_LDADD += -lcups -lpthread -lm -lcrypt
+gcp_LDADD += $(GLIB_LIBS)
+gcp_LDADD += $(GIO_LIBS)
+gcp_LDADD += $(GIOUNIX_LIBS)
+gcp_LDADD += $(GOBJECT_LIBS)
+gcp_LDADD += $(REST_LIBS)
+gcp_LDADD += $(JSONGLIB_LIBS)
+gcp_LDADD += $(GOA_LIBS)

@@ -9,7 +9,7 @@
 #include <goa/goa.h>
 #include <string.h>
 #include <stdio.h>
-#include "backend_interface.h"
+#include <cpd-interface-headers/backend_interface.h>
 
 #define PRINTER_ADDED_ARGS "(sssssbss)"
 #define PRINTER_ADDED_SIGNAL "PrinterAdded"
