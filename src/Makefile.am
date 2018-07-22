@@ -11,7 +11,7 @@ gcp_CPPFLAGS += $(JSONGLIB_CFLAGS)
 gcp_CPPFLAGS += $(GOA_CFLAGS)
 
 gcp_LDADD  =  $(CPDBBACKEND_LIBS)
-gcp_LDADD += -lcups -lpthread -lm -lcrypt
+gcp_LDADD += -lpthread -lm -lcrypt
 gcp_LDADD += $(GLIB_LIBS)
 gcp_LDADD += $(GIO_LIBS)
 gcp_LDADD += $(GIOUNIX_LIBS)
