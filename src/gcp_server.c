@@ -206,6 +206,7 @@ on_handle_print_file (PrintBackend *skeleton,
                       const gchar *file_path_name,
                       gint num_settings,
                       GVariant *settings,
+                      const gchar *final_file_path,
                       gpointer user_data)
 {
   g_print ("on_handle_print_file() called\n");
