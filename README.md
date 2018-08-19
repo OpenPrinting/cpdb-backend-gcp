@@ -10,7 +10,7 @@ The [Common Printing Dialog](https://wiki.ubuntu.com/CommonPrintingDialog) proje
 
 ### For building the backend
 
-- [cpdb-libs](https://github.com/OpenPrinting/cpdb-libs)
+- [cpdb-libs](https://github.com/OpenPrinting/cpdb-libs) : Version >= 1.2.0
 
 - GLIB 2.0:
 `sudo apt install libglib2.0-dev`

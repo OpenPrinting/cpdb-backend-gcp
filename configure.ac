@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([cpdb-backend-gcp],[1.0.0],[dubey.abhijeet09@gmail.com],[CPDB - Google Cloud Print Backend], [https://github.com/OpenPrinting/cpdb-backend-gcp])
+AC_INIT([cpdb-backend-gcp],[1.1.0],[dubey.abhijeet09@gmail.com],[CPDB - Google Cloud Print Backend], [https://github.com/OpenPrinting/cpdb-backend-gcp])
 AM_INIT_AUTOMAKE([-Wall foreign])
 AC_CONFIG_SRCDIR([src/gcp.c])
 
